@@ -75,11 +75,24 @@ LEFT JOIN
 ON r.id = o.id
 WHERE r.id IS NULL
 '''
+
+q1 = "SELECT * FROM runners"
+df_run = pd.read_sql(q1, con=engine)
+df_run.to_csv('runners.csv')
+
+q2 = "SELECT * FROM organizers"
+df_vol = pd.read_sql(q2, con=engine)
+df_vol.to_csv('volu.csv')
+
 df = pd.read_sql(querie, con=engine)
+
+
+final_df = df[['profile_link', 'last_name', 'first_name', 'min_time', 
+                      'number_of_runs', 'number_of_helps']]
 
 # Отображаем таблицу 
 st.data_editor(
-    df,
+    final_df,
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width='small'),
         'last_name': st.column_config.Column(label="Фамилия", width='medium'),     
