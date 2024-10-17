@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine, text
@@ -372,3 +373,6 @@ if search_query:
         st.dataframe(df_results)  # Отображаем результаты в виде таблицы
     else:
         st.write("Нет результатов по вашему запросу.")
+
+
+components.iframe("https://html-preview.github.io/?url=https://github.com/AndreyKurdyubov/protocol5/blob/main/out.html", height=600, scrolling=True)
