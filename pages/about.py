@@ -449,7 +449,7 @@ def go_search_by_role(option, engine):
                                 MAX(run_date) as last_date_of_role,
                                 profile_link
                         FROM organizers
-                        WHERE volunteer_role LIKE "%{option}%"
+                        WHERE volunteer_role LIKE "%{option}%" AND run_number != ''
                         GROUP BY profile_link;
                      ''')
     try:
