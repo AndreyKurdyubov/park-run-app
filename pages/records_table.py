@@ -168,12 +168,26 @@ st.data_editor(
 st.header('Первое волонтерство на 5 верст')
 
 querie = '''
+WITH runner AS (
+    SELECT 
+        profile_link,
+        time,
+        run_date,
+        position
+    FROM runners
+    WHERE run_date = (SELECT MAX(run_date) FROM runners)
+    --WHERE substr(run_date, 1, 10) = "2025-01-04"
+    )
 SELECT 
-profile_link,
-name
-FROM organizers
+    o.profile_link,
+    o.name,
+    r.position, 
+    r.time
+FROM organizers o
+LEFT JOIN runner r 
+    ON r.profile_link = o.profile_link
 WHERE volunteers = "1 волонтёрство"
-AND run_date = (
+AND o.run_date = (
     SELECT MAX(run_date)
     FROM organizers
 );
@@ -190,6 +204,8 @@ st.data_editor(
         # 'finishes': st.column_config.Column(label="# финишей", width='medium'),
         # 'volunteers': st.column_config.Column(label="# волонтерств", width='medium'),
         # 'achievements': st.column_config.Column(label="Достижения", width='large'),
+        'time': st.column_config.Column(label="Время", width=''),
+        'position': st.column_config.Column(label="Позиция", width=''),
     },
     hide_index=True
 )
@@ -197,10 +213,25 @@ st.data_editor(
 st.header('Первое волонтерство в Петергофе')
 
 querie = '''
+WITH runner AS (
+    SELECT 
+        profile_link,
+        time,
+        run_date,
+        position
+    FROM runners
+    WHERE run_date = (SELECT MAX(run_date) FROM runners)
+    --WHERE substr(run_date, 1, 10) = "2025-01-04"
+    )
 SELECT 
-u.profile_link, u.name, u.volunteers
+    u.profile_link, 
+    u.name, 
+    u.volunteers, 
+    r.time,
+    r.position
 FROM organizers o
 JOIN users u on u.profile_link = o.profile_link
+LEFT JOIN runner r ON r.profile_link = o.profile_link
 WHERE u.peterhof_volunteers_count = 1 
 AND o.run_date = (
     SELECT MAX(o1.run_date)
@@ -220,6 +251,8 @@ st.data_editor(
         # 'finishes': st.column_config.Column(label="# финишей", width='medium'),
         'volunteers': st.column_config.Column(label="# волонтерств", width=''),
         # 'achievements': st.column_config.Column(label="Достижения", width='large'),
+        'time': st.column_config.Column(label="Время", width=''),
+        'position': st.column_config.Column(label="Позиция", width=''),
     },
     hide_index=True
 )
@@ -237,9 +270,9 @@ WITH ranked_runs AS (
 SELECT 
     p.profile_link,
     p.name,
+    p.finishes,
     p.time,
-    p.position,
-    p.finishes
+    p.position
     --rr1.run_date AS last_date,
     --rr1.finishes AS last_finishes,
     --rr2.run_date AS second_to_last_date,
@@ -248,9 +281,9 @@ FROM (
     SELECT 
         profile_link,
         name,
+        finishes,
         time,
-        position,
-        finishes
+        position
     FROM runners
     WHERE 
         finishes IN ('10 финишей', '25 финишей', '50 финишей', '100 финишей')
@@ -272,7 +305,7 @@ st.data_editor(
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'time': st.column_config.Column(label="Время", width=''),
         'position': st.column_config.Column(label="Позиция", width=''),
-        'finishes': st.column_config.Column(label="# финишей", width='medium'),
+        'finishes': st.column_config.Column(label="# финишей", width='m'),
         'volunteers': st.column_config.Column(label="# волонтерств", width='medium'),
         'achievements': st.column_config.Column(label="Достижения", width='large'),
     },
@@ -283,36 +316,29 @@ st.data_editor(
 st.header('Вступившие в клубы волонтёрств')
 
 querie = '''
-WITH ranked_runs AS (
-  SELECT 
-    name,
-    run_date,
-    volunteers,
-    ROW_NUMBER() OVER (PARTITION BY name ORDER BY run_date DESC) AS run_rank
-  FROM runners
-)
-SELECT 
-    p.profile_link,
-    p.name,
-    p.volunteers
-    --rr1.run_date AS last_date,
-    --rr1.volunteers AS last_volunteers,
-    --rr2.run_date AS second_to_last_date,
-    --rr2.volunteers AS second_to_last_volunteers
-FROM (
+WITH runner AS (
     SELECT 
         profile_link,
-        name,
-        volunteers
-    FROM organizers
+        time,
+        run_date,
+        position
+    FROM runners
+    WHERE run_date = (SELECT MAX(run_date) FROM runners)
+    --WHERE substr(run_date, 1, 10) = "2025-01-04"
+    )
+SELECT 
+        o.profile_link,
+        o.name,
+        o.volunteers,
+        --substr(o.run_date, 1, 10),
+        r.time,
+        r.position
+    FROM organizers o
+    LEFT JOIN runner r 
+        ON r.profile_link = o.profile_link
     WHERE 
-        volunteers IN ('10 волонтёрств', '25 волонтёрств', '50 волонтёрств', '100 волонтёрств')
-        AND run_date = (SELECT MAX(run_date) FROM organizers)
-) p
-LEFT JOIN ranked_runs rr1
-    ON p.name = rr1.name AND rr1.run_rank = 1
-LEFT JOIN ranked_runs rr2
-    ON p.name = rr2.name AND rr2.run_rank = 2;
+        o.volunteers IN ('10 волонтёрств', '25 волонтёрств', '50 волонтёрств', '100 волонтёрств')
+        AND o.run_date = (SELECT MAX(run_date) FROM organizers)
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -325,6 +351,8 @@ st.data_editor(
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'finishes': st.column_config.Column(label="# финишей", width=''),
         'volunteers': st.column_config.Column(label="# волонтерств", width=''),
+        'time': st.column_config.Column(label="Время", width=''),
+        'position': st.column_config.Column(label="Позиция", width=''),
         'achievements': st.column_config.Column(label="Достижения", width=''),
     },
     hide_index=True
@@ -332,24 +360,29 @@ st.data_editor(
 
 # st.header('тест')
 # querie = '''
-# WITH ranked_runs AS (
-#   SELECT 
-#     name,
-#     run_date,
-#     finishes,
-#     ROW_NUMBER() OVER (PARTITION BY name ORDER BY run_date DESC) AS run_rank
-#   FROM runners
-# )
+# WITH runner AS (
+#     SELECT 
+#         profile_link,
+#         time,
+#         run_date,
+#         position
+#     FROM runners
+#     --WHERE run_date = (SELECT MAX(run_date) FROM runners)
+#     WHERE substr(run_date, 1, 10) = "2025-01-04"
+#     )
 # SELECT 
-#   t1.name,
-#   t1.run_date AS last_date,
-#   t1.finishes AS last_finishes,
-#   t2.run_date AS second_to_last_date,
-#   t2.finishes AS second_to_last_finishes
-# FROM ranked_runs t1
-# LEFT JOIN ranked_runs t2
-#   ON t1.name = t2.name AND t2.run_rank = 2
-# WHERE t1.run_rank = 1
+#         o.profile_link,
+#         o.name,
+#         o.volunteers,
+#         substr(o.run_date, 1, 10),
+#         r.position,
+#         r.time
+#     FROM organizers o
+#     LEFT JOIN runner r 
+#         ON r.profile_link = o.profile_link
+#     WHERE 
+#         o.volunteers IN ('10 волонтёрств', '25 волонтёрств', '50 волонтёрств', '100 волонтёрств')
+#         AND o.run_date = (SELECT MAX(run_date) FROM organizers)
 # '''
 # df = pd.read_sql(querie, con=engine)
 # # Отображаем таблицу
