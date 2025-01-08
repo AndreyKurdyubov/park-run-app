@@ -181,8 +181,8 @@ WITH runner AS (
 SELECT 
     o.profile_link,
     o.name,
-    r.position, 
-    r.time
+    r.time,
+    r.position
 FROM organizers o
 LEFT JOIN runner r 
     ON r.profile_link = o.profile_link
