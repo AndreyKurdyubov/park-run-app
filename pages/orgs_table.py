@@ -10,6 +10,7 @@ engine = create_engine('sqlite:///mydatabase.db')
 querie = '''
 SELECT run, run_number, run_date, finisher, name, profile_link, participant_id, finishes, volunteers, clubs, volunteer_role, first_volunteer_info
 FROM organizers
+WHERE name LIKE 'Наталия ПАЛАМАРЧУК' AND volunteer_role LIKE '%Организатор%' AND run_number != ''
 '''
 df = pd.read_sql(querie, con=engine)
 

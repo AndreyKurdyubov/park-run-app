@@ -73,6 +73,7 @@ async def fetch(session, url, semaphore):
             return None
 
 # Асинхронная функция для парсинга основной таблицы результатов
+# https://5verst.ru/results/latest/
 async def parse_main_table(session, url, semaphore):
     response_text = await fetch(session, url, semaphore)
     if response_text is None:
@@ -93,6 +94,7 @@ async def parse_main_table(session, url, semaphore):
     return starts_latest
 
 # Асинхронная функция для парсинга страницы с забегом
+# https://5verst.ru/petergofaleksandriysky/results/all/
 async def parse_run_page(session, run_link, location_name, semaphore):
     response_text = await fetch(session, run_link, semaphore)
     if response_text is None:
@@ -112,8 +114,9 @@ async def parse_run_page(session, run_link, location_name, semaphore):
         avg_time = run_cells[4].get_text(strip=True)
         best_female_time = run_cells[5].get_text(strip=True)
         best_male_time = run_cells[6].get_text(strip=True)
-
-        run_data.append([location_name, number, date_cell, link, finishers, volunteers, avg_time, best_female_time, best_male_time])
+        
+        if number:
+            run_data.append([location_name, number, date_cell, link, finishers, volunteers, avg_time, best_female_time, best_male_time])
 
     return run_data
 
