@@ -358,34 +358,35 @@ st.data_editor(
     hide_index=True
 )
 
-# st.header('тест')
-# querie = '''
-# WITH runner AS (
-#     SELECT 
-#         profile_link,
-#         time,
-#         run_date,
-#         position
-#     FROM runners
-#     --WHERE run_date = (SELECT MAX(run_date) FROM runners)
-#     WHERE substr(run_date, 1, 10) = "2025-01-04"
-#     )
-# SELECT 
-#         o.profile_link,
-#         o.name,
-#         o.volunteers,
-#         substr(o.run_date, 1, 10),
-#         r.position,
-#         r.time
-#     FROM organizers o
-#     LEFT JOIN runner r 
-#         ON r.profile_link = o.profile_link
-#     WHERE 
-#         o.volunteers IN ('10 волонтёрств', '25 волонтёрств', '50 волонтёрств', '100 волонтёрств')
-#         AND o.run_date = (SELECT MAX(run_date) FROM organizers)
-# '''
-# df = pd.read_sql(querie, con=engine)
-# # Отображаем таблицу
-# st.data_editor(
-#     df,
-#     hide_index=True)
+st.header('Вторая суббота в Петергофе')
+
+querie = '''
+WITH au as (
+SELECT profile_link, name, run_date, position, Null as volunteer_role
+FROM runners
+WHERE profile_link LIKE "%userstats%"
+UNION ALL
+SELECT profile_link, name, run_date, Null as position, volunteer_role
+FROM organizers 
+WHERE profile_link LIKE "%userstats%")
+SELECT profile_link, name, position, volunteer_role, max(run_date) as last_date, count(distinct run_date) as num_subbot
+FROM au
+GROUP BY profile_link 
+HAVING num_subbot = 2 AND last_date = (SELECT max(run_date) FROM au)
+'''
+
+df = pd.read_sql(querie, con=engine)
+
+# Отображаем таблицу
+st.data_editor(
+    df,
+    column_config={
+        'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
+        'name': st.column_config.Column(label="Участник", width='medium'), 
+        'volunteer_role': st.column_config.Column(label="Роль", width=''),
+        'position': st.column_config.Column(label="Позиция", width=''),
+        'last_date': None,
+        'num_subbot':  st.column_config.Column(label="Субботы", width=''),
+    },
+    hide_index=True
+)
