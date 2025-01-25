@@ -369,9 +369,11 @@ UNION ALL
 SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
 WHERE profile_link LIKE "%userstats%")
-SELECT profile_link, name, position, volunteer_role, max(run_date) as last_date, count(distinct run_date) as num_subbot
+SELECT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, max(au.run_date) as last_date, count(distinct au.run_date) as num_subbot, 
+CAST(us.finishes AS INT) as finishes, CAST(us.volunteers AS INT) as volunteers
 FROM au
-GROUP BY profile_link 
+JOIN users us on au.profile_link = us.profile_link
+GROUP BY au.profile_link 
 HAVING num_subbot = 2 AND last_date = (SELECT max(run_date) FROM au)
 '''
 
@@ -386,7 +388,9 @@ st.data_editor(
         'volunteer_role': st.column_config.Column(label="Роль", width=''),
         'position': st.column_config.Column(label="Позиция", width=''),
         'last_date': None,
-        'num_subbot':  st.column_config.Column(label="Субботы", width=''),
+        'num_subbot':  st.column_config.Column(label="# суббот в Петергофе", width=''),
+        'finishes': st.column_config.Column(label="# финишей на 5 верст", width=''),
+        'volunteers': st.column_config.Column(label="# волонтерств на 5 верст", width=''),
     },
     hide_index=True
 )
