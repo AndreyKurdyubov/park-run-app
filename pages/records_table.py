@@ -370,11 +370,18 @@ SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
 WHERE profile_link LIKE "%userstats%")
 SELECT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, max(au.run_date) as last_date, count(distinct au.run_date) as num_subbot, 
-CAST(us.finishes AS INT) as finishes, CAST(us.volunteers AS INT) as volunteers
+--CAST(us.finishes AS INT) as finishes, 
+--CAST(us.volunteers AS INT) as volunteers, 
+us.peterhof_finishes_count,
+us.peterhof_volunteers_count
 FROM au
 JOIN users us on au.profile_link = us.profile_link
 GROUP BY au.profile_link 
-HAVING num_subbot = 2 AND last_date = (SELECT max(run_date) FROM au)
+HAVING last_date = (SELECT max(run_date) FROM au) AND 
+                    (num_subbot = 2 OR 
+                    (us.peterhof_finishes_count = 2) OR 
+                    (us.peterhof_volunteers_count = 2 AND au.volunteer_role IS NOT Null)
+                    )
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -389,8 +396,8 @@ st.data_editor(
         'position': st.column_config.Column(label="Позиция", width=''),
         'last_date': None,
         'num_subbot':  st.column_config.Column(label="# суббот в Петергофе", width=''),
-        'finishes': st.column_config.Column(label="# финишей на 5 верст", width=''),
-        'volunteers': st.column_config.Column(label="# волонтерств на 5 верст", width=''),
+        'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width=''),
+        'peterhof_volunteers_count': st.column_config.Column(label="# волонтерств в Петергофе", width=''),
     },
     hide_index=True
 )
