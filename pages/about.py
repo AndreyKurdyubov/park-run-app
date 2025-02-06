@@ -257,24 +257,29 @@ async def parse_participant_page(participant_link, session, semaphore):
         finishes = volunteers = best_time = best_time_link = 'N/A'
         clubs_titles = ''
 
+    peterhof_finishes_count = peterhof_volunteers_count = 0   # by default
+
     # Найдём таблицы для забегов в Петергофе
     tables = soup.find_all('table')
     if tables:
+        vol_tab = 1  # по дефолту, волонтерства идут второй таблицей
         # Подсчёт финишей в Петергофе
-        peterhof_finishes_count = sum(1 for row in tables[0].find_all('tr')[1:] if 'Петергоф Александрийский' in row.find_all('td')[1].text.strip()) if len(tables) > 0 else 0
-
+        if len(tables) > 1:  # есть финиши
+            peterhof_finishes_count = sum(1 for row in tables[0].find_all('tr')[1:] if 'Петергоф Александрийский' in row.find_all('td')[1].text.strip()) if len(tables) > 0 else 0
+        else: # нет финишей
+            vol_tab = 0  # есть только таблица волонтерств  
+        
         # Для волонтёрств создаём множество для уникальных дат
         peterhof_volunteer_dates = set()
-        if len(tables) > 1:
-            for row in tables[1].find_all('tr')[1:]:
+
+        if len(tables) != 2: # если есть волонтерства, то число таблиц не 2
+            for row in tables[vol_tab].find_all('tr')[1:]:
                 location = row.find_all('td')[1].text.strip()
                 if 'Петергоф Александрийский' in location:
                     date = row.find_all('td')[0].text.strip()  # Извлекаем дату
                     peterhof_volunteer_dates.add(date)  # Добавляем дату в множество (уникальные даты)
         peterhof_volunteers_count = len(peterhof_volunteer_dates)  # Количество уникальных дат волонтёрств
-    else:
-        peterhof_finishes_count = peterhof_volunteers_count = 0
-
+      
     # Возвращаем собранные данные
     stats_data.append([best_time, finishes, peterhof_finishes_count, volunteers, peterhof_volunteers_count, clubs_titles, best_time_link])
     return stats_data

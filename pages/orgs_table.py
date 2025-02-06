@@ -8,8 +8,8 @@ st.title('Данные по пробегам и организаторам')
 
 engine = create_engine('sqlite:///mydatabase.db')
 querie = '''
-SELECT *
-FROM users
+SELECT count(distinct profile_link)
+FROM organizers
 '''
 df = pd.read_sql(querie, con=engine)
 
