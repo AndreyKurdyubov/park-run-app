@@ -8,19 +8,18 @@ st.title('Данные по пробегам и организаторам')
 
 engine = create_engine('sqlite:///mydatabase.db')
 querie = '''
-SELECT run, run_number, run_date, finisher, name, profile_link, participant_id, finishes, volunteers, clubs, volunteer_role, first_volunteer_info
-FROM organizers
-WHERE name LIKE 'Наталия ПАЛАМАРЧУК' AND volunteer_role LIKE '%Организатор%' AND run_number != ''
+SELECT *
+FROM users
 '''
 df = pd.read_sql(querie, con=engine)
 
 df = pd.read_sql(querie, con=engine)
-df['run_date'] = pd.to_datetime(df['run_date'])
-df['run_date'] = df['run_date'].dt.strftime('%d.%m.%Y')
+# df['run_date'] = pd.to_datetime(df['run_date'])
+# df['run_date'] = df['run_date'].dt.strftime('%d.%m.%Y')
 
-st.write(f'Всего событий {len(df)}')
-unique_orgs_number = len(df['participant_id'].unique())
-st.write(f'Уникальных участников {unique_orgs_number}')
+# st.write(f'Всего событий {len(df)}')
+# unique_orgs_number = len(df['participant_id'].unique())
+# st.write(f'Уникальных участников {unique_orgs_number}')
 
 # Отображаем таблицу 
 st.data_editor(
