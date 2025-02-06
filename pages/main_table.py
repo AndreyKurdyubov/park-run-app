@@ -12,8 +12,8 @@ st.header('База участников 5Верст в Петергофе')
 engine = create_engine('sqlite:///mydatabase.db')
     
 querie = '''
-SELECT profile_link, name, best_time, finishes, 
-        peterhof_finishes_count, volunteers, peterhof_volunteers_count, clubs_titles
+SELECT profile_link, name, best_time, CAST(finishes as int) as finishes, 
+        peterhof_finishes_count, CAST(volunteers as int) as volunteers, peterhof_volunteers_count, clubs_titles
 FROM users
 '''
 # querie = '''
@@ -61,7 +61,7 @@ with st.container():
         df,
         column_config={
             'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width='100px'),
-            'name': st.column_config.Column(label="Участник", width='large'), 
+            'name': st.column_config.Column(label="Участник", width=''), 
             'best_time': st.column_config.Column(label="Лучшее время", width='100px'),
             'finishes': st.column_config.Column(label="# финишей", width='100px'),
             'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width='150px'),
