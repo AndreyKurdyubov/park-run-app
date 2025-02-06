@@ -13,42 +13,6 @@ engine = create_engine('sqlite:///mydatabase.db')
 # Заголовок
 st.title('Таблицы по рекордсменам, новичкам и вступившим в клубы 10/25/50/100')
 
-# st.header('Таблица для сверки результатов')
-
-# querie = '''
-# SELECT 
-#     profile_link,
-#     name,
-#     finishes,
-#     volunteers,
-#     achievements
-# FROM runners
-# WHERE (
-#     finishes IN ('10 финишей', '25 финишей', '50 финишей', '100 финишей')
-#     OR volunteers IN ('10 волонтёрств', '25 волонтёрств', '50 волонтёрств', '100 волонтёрств')
-#     OR (achievements IS NOT NULL AND TRIM(achievements) != '')
-# )
-# AND run_date = (
-#     SELECT MAX(run_date)
-#     FROM runners
-# );
-# '''
-
-# df = pd.read_sql(querie, con=engine)
-
-# # Отображаем таблицу
-# st.data_editor(
-#     df,
-#     column_config={
-#         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width='medium'),
-#         'name': st.column_config.Column(label="Участник", width='large'), 
-#         'finishes': st.column_config.Column(label="# финишей", width='medium'),
-#         'volunteers': st.column_config.Column(label="# волонтерств", width='medium'),
-#         'achievements': st.column_config.Column(label="Достижения", width='large'),
-#     },
-#     hide_index=True
-# )
-
 st.header('Рекорды')
 
 querie = '''
@@ -259,40 +223,15 @@ st.data_editor(
 
 st.header('Вступившие в клубы пробегов')
 querie = '''
-WITH ranked_runs AS (
-  SELECT 
-    name,
-    run_date,
-    finishes,
-    ROW_NUMBER() OVER (PARTITION BY name ORDER BY run_date DESC) AS run_rank
-  FROM runners
-)
-SELECT 
-    p.profile_link,
-    p.name,
-    p.finishes,
-    p.time,
-    p.position
-    --rr1.run_date AS last_date,
-    --rr1.finishes AS last_finishes,
-    --rr2.run_date AS second_to_last_date,
-    --rr2.finishes AS second_to_last_finishes
-FROM (
-    SELECT 
-        profile_link,
-        name,
-        finishes,
-        time,
-        position
-    FROM runners
-    WHERE 
-        finishes IN ('10 финишей', '25 финишей', '50 финишей', '100 финишей')
-        AND run_date = (SELECT MAX(run_date) FROM runners)
-) p
-LEFT JOIN ranked_runs rr1
-    ON p.name = rr1.name AND rr1.run_rank = 1
-LEFT JOIN ranked_runs rr2
-    ON p.name = rr2.name AND rr2.run_rank = 2;
+SELECT     
+    r.profile_link,
+    r.name,
+    u.finishes,
+    r.time,
+    r.position
+FROM runners r
+LEFT JOIN USERS u on r.profile_link = u.profile_link
+WHERE r.run_date = (SELECT max(run_date) FROM runners) AND u.finishes IN (10, 25, 50, 100, 150)
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -334,10 +273,12 @@ SELECT
         r.time,
         r.position
     FROM organizers o
+    LEFT JOIN users u
+        ON o.profile_link = u.profile_link
     LEFT JOIN runner r 
         ON r.profile_link = o.profile_link
     WHERE 
-        o.volunteers IN ('10 волонтёрств', '25 волонтёрств', '50 волонтёрств', '100 волонтёрств')
+        u.volunteers IN (10, 25, 50, 100, 150)
         AND o.run_date = (SELECT MAX(run_date) FROM organizers)
 '''
 
