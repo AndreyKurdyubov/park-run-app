@@ -268,7 +268,7 @@ WITH runner AS (
 SELECT 
         o.profile_link,
         o.name,
-        o.volunteers,
+        u.volunteers,
         --substr(o.run_date, 1, 10),
         r.time,
         r.position
