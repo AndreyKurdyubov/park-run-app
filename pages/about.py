@@ -404,19 +404,22 @@ def get_last_date_from_db(db_url='sqlite:///mydatabase.db'):
     if not os.path.exists(db_path):
         return None  # Если базы данных нет, возвращаем None
     
-    
-    # Подключение к базе данных, если файл существует
-    engine = create_engine(db_url)
-    with engine.connect() as connection:
-        query = text("SELECT MAX(run_date) FROM runners;")  # Заменить run_date на реальное имя колонки с датой
-        result = connection.execute(query)
-        last_date_db = result.scalar()
+    try:
+        # Подключение к базе данных, если файл существует
+        engine = create_engine(db_url)
+        with engine.connect() as connection:
+            query = text("SELECT MAX(run_date) FROM runners;")  # Заменить run_date на реальное имя колонки с датой
+            result = connection.execute(query)
+            last_date_db = result.scalar()
 
-        # Проверяем, если last_date_db не None, то преобразуем строку в дату
-        if last_date_db:
-            last_date_db = datetime.strptime(last_date_db, '%Y-%m-%d %H:%M:%S.%f').date()
-        else:
-            last_date_db = None
+            # Проверяем, если last_date_db не None, то преобразуем строку в дату
+            if last_date_db:
+                last_date_db = datetime.strptime(last_date_db, '%Y-%m-%d %H:%M:%S.%f').date()
+            else:
+                last_date_db = None
+    except Exception as e:
+        st.write(f"Произошла ошибка: {e}")
+        return None
     return last_date_db
 
 
