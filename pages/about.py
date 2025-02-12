@@ -309,8 +309,12 @@ async def get_all_stats_data(df_runners, df_orgs):
             if parsed_data:  # Если данные были успешно получены
                 try:
                     participant_row = df_runners[df_runners['profile_link'] == link].iloc[0]
+                    sex = participant_row['age_group'][0]
+                    if sex not in ['М', 'Ж']:
+                        sex = None
                 except IndexError:
                     participant_row = df_orgs[df_orgs['profile_link'] == link].iloc[0] # если участник только в волонтерах
+                    sex = None
 
                 name = participant_row['name']
                 name_lc = participant_row['name_lc']
@@ -319,7 +323,7 @@ async def get_all_stats_data(df_runners, df_orgs):
 
                 # Добавляем данные в общий список, включая данные из таблицы df_runners
                 for data in parsed_data:
-                    all_stats_data.append([name, name_lc, profile_link, participant_id] + data)
+                    all_stats_data.append([name, name_lc, sex, profile_link, participant_id] + data)
 
     # Возвращаем итоговый список данных
     return all_stats_data
@@ -371,7 +375,7 @@ async def update_data():
 
     # Создаём DataFrame для итоговой статистики
     df_stats = pd.DataFrame(all_stats_data, columns=[
-        'name', 'name_lc', 'profile_link', 'participant_id', 'best_time', 'finishes', 
+        'name', 'name_lc', 'sex', 'profile_link', 'participant_id', 'best_time', 'finishes', 
         'peterhof_finishes_count', 'volunteers', 'peterhof_volunteers_count', 
         'clubs_titles', 'best_time_link'
     ])
