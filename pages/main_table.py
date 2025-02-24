@@ -46,11 +46,14 @@ if datefrom:
     WHERE run_date >= "{datefrom}" and profile_link LIKE "%userstats%"
     ),
     Profs as (SELECT distinct profile_link FROM aProfs)
-    SELECT u.profile_link, u.sex, u.name, u.best_time, CAST(u.finishes as int) as finishes, 
+    SELECT  
+        ROW_NUMBER () OVER (ORDER BY u.name) RowNum,
+        u.profile_link, u.sex, u.name, u.best_time, CAST(u.finishes as int) as finishes, 
         u.peterhof_finishes_count, CAST(u.volunteers as int) as volunteers, u.peterhof_volunteers_count, u.clubs_titles
     FROM Profs
     LEFT JOIN users u on u.profile_link = Profs.profile_link
     WHERE sex LIKE "%{choice}" OR sex is Null
+    ORDER By u.name
     '''
 
 df = pd.read_sql(querie, con=engine)

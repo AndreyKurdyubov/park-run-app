@@ -321,6 +321,13 @@ async def get_all_stats_data(df_runners, df_orgs):
                 profile_link = participant_row['profile_link']
                 participant_id = participant_row['participant_id']
 
+                if sex == None:
+                    sex_exception = {'Михаил': 'М', 'Юрий': 'М', 'Анатолий': 'М', 'Ирина': 'Ж', 'Олег': 'М', 'Антон': 'М', 'Вера': 'Ж', 'Дарья': 'Ж', 'Кирилл': 'М', 'Мария': 'Ж', 'Александр': 'М', 'Самат': 'М', 'Евгения': 'Ж', 
+                    'Тимофей': 'М', 'Варвара': 'Ж', 'Татьяна': 'Ж', 'Юлия': 'Ж', 'Анна': 'Ж', 'Алексей': 'М', 'Полина': 'Ж', 'Liubov': 'Ж', 'Николай': 'М', 'Елизавета': 'Ж', 'София': 'Ж', 'Анастасия': 'Ж', 'Станислава': 'Ж', 
+                    'Маргарита': 'Ж', 'Эллина': 'Ж', 'Светлана': 'Ж', 'Ксения': 'Ж', 'Станислав': 'М', 'Иван': 'М', 'Руслан': 'М', 'Ольга': 'Ж', 'Ярослав': 'М', 'Черняев': 'М', 'Антонина': 'Ж', 'Артём': 'М'}
+                    first_name = name.split()[0]
+                    sex = sex_exception.get(first_name)  # sex or None
+
                 # Добавляем данные в общий список, включая данные из таблицы df_runners
                 for data in parsed_data:
                     all_stats_data.append([name, name_lc, sex, profile_link, participant_id] + data)
