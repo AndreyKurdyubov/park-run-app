@@ -370,11 +370,11 @@ async def update_data():
         'best_female_time', 'best_male_time', 'name', 'name_lc', 'profile_link', 'participant_id',
         'finishes', 'volunteers', 'clubs', 'volunteer_role', 'first_volunteer_info'
     ])
-    df_orgs = (
-        df_orgs.groupby([col for col in df_orgs.columns if col != 'volunteer_role'])['volunteer_role']
-        .apply(lambda x: ', '.join(x))
-        .reset_index()
-    )
+    # df_orgs = (
+    #     df_orgs.groupby([col for col in df_orgs.columns if col != 'volunteer_role'])['volunteer_role']
+    #     .apply(lambda x: ', '.join(x))
+    #     .reset_index()
+    # )
     df_orgs['run_date'] = pd.to_datetime(df_orgs['run_date'], dayfirst=True)
 
     # Получаем статистические данные
