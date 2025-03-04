@@ -263,9 +263,13 @@ async def parse_participant_page(participant_link, session, semaphore):
     tables = soup.find_all('table')
     if tables:
         vol_tab = 1  # по дефолту, волонтерства идут второй таблицей
+        second_time = None  #  second best time
         # Подсчёт финишей в Петергофе
         if len(tables) > 1:  # есть финиши
             peterhof_finishes_count = sum(1 for row in tables[0].find_all('tr')[1:] if 'Петергоф Александрийский' in row.find_all('td')[1].text.strip()) if len(tables) > 0 else 0
+            times = [row.find_all('td')[2].text.strip() for row in tables[0].find_all('tr')[2:]]  # list of all finish times except first 
+            if len(times) > 0:
+                second_time = min(times)
         else: # нет финишей
             vol_tab = 0  # есть только таблица волонтерств  
         
@@ -281,7 +285,7 @@ async def parse_participant_page(participant_link, session, semaphore):
         peterhof_volunteers_count = len(peterhof_volunteer_dates)  # Количество уникальных дат волонтёрств
       
     # Возвращаем собранные данные
-    stats_data.append([best_time, finishes, peterhof_finishes_count, volunteers, peterhof_volunteers_count, clubs_titles, best_time_link])
+    stats_data.append([best_time, second_time, finishes, peterhof_finishes_count, volunteers, peterhof_volunteers_count, clubs_titles, best_time_link])
     return stats_data
 
 # Основная функция для сбора данных
@@ -382,7 +386,7 @@ async def update_data():
 
     # Создаём DataFrame для итоговой статистики
     df_stats = pd.DataFrame(all_stats_data, columns=[
-        'name', 'name_lc', 'sex', 'profile_link', 'participant_id', 'best_time', 'finishes', 
+        'name', 'name_lc', 'sex', 'profile_link', 'participant_id', 'best_time', 'second_time', 'finishes', 
         'peterhof_finishes_count', 'volunteers', 'peterhof_volunteers_count', 
         'clubs_titles', 'best_time_link'
     ])

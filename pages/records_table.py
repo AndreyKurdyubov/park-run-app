@@ -17,14 +17,17 @@ st.header('Рекорды')
 
 querie = '''
 SELECT 
-    profile_link,
-    name,
-    time,
-    position
+    r.profile_link,
+    r.name,
+    r.position,
+    r.time,
+    u.second_time,
+    time(-strftime('%s', r.time) + strftime('%s', u.second_time), 'unixepoch' ) as dif
     --finishes,
     --volunteers,
     --achievements
-FROM runners
+FROM runners r
+LEFT JOIN users u on u.profile_link = r.profile_link
 WHERE (
 achievements LIKE '%Личный рекорд!%' 
 )
@@ -42,7 +45,8 @@ st.data_editor(
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
         'name': st.column_config.Column(label="Участник", width='medium'), 
-        'time': st.column_config.Column(label="Время", width=''), 
+        'time': st.column_config.Column(label="Рекорд", width=''), 
+        'second_time': st.column_config.Column(label="Экс-рекорд", width=''), 
         'position': st.column_config.Column(label="Позиция", width=''), 
         'finishes': st.column_config.Column(label="# финишей", width='medium'),
         'volunteers': st.column_config.Column(label="# волонтерств", width='medium'),
@@ -57,14 +61,16 @@ st.header('Первый финиш на 5 верст')
 
 querie = '''
 SELECT 
-    profile_link,
-    name,
-    time,
-    position
+    r.profile_link,
+    r.name,
+    r.position,
+    r.time
+    --u.second_time
     --finishes,
     --volunteers,
     --achievements
-FROM runners
+FROM runners r
+LEFT JOIN users u on u.profile_link = r.profile_link
 WHERE (
 achievements LIKE '%Первый финиш на 5 вёрст%'
 )
