@@ -10,9 +10,11 @@ st.title('Тестирование')
 engine = create_engine('sqlite:///mydatabase.db')
 
 querie = '''
-SELECT *
-FROM organizers
-GROUP BY sex, volunteers_role
+SELECT u.sex as пол, o.volunteer_role as роль, count(*) as количество
+FROM users u 
+LEFT JOIN organizers o on o.profile_link = u.profile_link
+GROUP BY u.sex, o.volunteer_role
+ORDER BY количество desc
 '''
 df = pd.read_sql(querie, con=engine)
 st.data_editor(
