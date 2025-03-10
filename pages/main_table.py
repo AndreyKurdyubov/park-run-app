@@ -49,7 +49,7 @@ if datefrom:
     Ages as (SELECT profile_link, max(age_group) as ag FROM runners GROUP By profile_link)
     SELECT  
         ROW_NUMBER () OVER (ORDER BY u.peterhof_finishes_count + u.peterhof_volunteers_count desc) RowNum,
-        u.profile_link, a.ag, u.name, u.best_time, 
+        u.profile_link, u.sex, a.ag, u.name, u.best_time, 
         u.peterhof_finishes_count + u.peterhof_volunteers_count as sum_fin_vol,
         --CAST(u.finishes as int) as finishes, 
         u.peterhof_finishes_count, 
