@@ -48,7 +48,7 @@ if datefrom:
     Profs as (SELECT distinct profile_link FROM aProfs),
     Ages as (SELECT profile_link, max(age_group) as ag FROM runners GROUP By profile_link)
     SELECT  
-        ROW_NUMBER () OVER (ORDER BY u.peterhof_finishes_count + u.peterhof_volunteers_count desc) RowNum,
+        ROW_NUMBER () OVER (ORDER BY u.peterhof_volunteers_count desc) RowNum, --u.peterhof_finishes_count + 
         u.profile_link, u.sex, a.ag, u.name, u.best_time, 
         u.peterhof_finishes_count + u.peterhof_volunteers_count as sum_fin_vol,
         --CAST(u.finishes as int) as finishes, 
@@ -60,7 +60,7 @@ if datefrom:
     LEFT JOIN users u on u.profile_link = Profs.profile_link
     LEFT JOIN Ages a on u.profile_link = a.profile_link
     WHERE sex LIKE "%{choice}" OR sex is Null
-    ORDER By sum_fin_vol desc
+    ORDER By 1
     '''
 
 df = pd.read_sql(querie, con=engine)

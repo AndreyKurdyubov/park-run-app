@@ -56,7 +56,8 @@ with col1:
 #####################################################################################################################################################
 
 main_url = 'https://5verst.ru/results/latest/'
-target_runs = ['Петергоф Александрийский']
+tarjet_park = 'Петергоф Александрийский'  # Петергоф Александрийский
+target_runs = [tarjet_park]
 
 # Устанавливаем таймаут и максимальное количество параллельных запросов
 MAX_CONCURRENT_REQUESTS = 10  # Максимум 10 запросов одновременно
@@ -266,7 +267,7 @@ async def parse_participant_page(participant_link, session, semaphore):
         second_time = None  #  second best time
         # Подсчёт финишей в Петергофе
         if len(tables) > 1:  # есть финиши
-            peterhof_finishes_count = sum(1 for row in tables[0].find_all('tr')[1:] if 'Петергоф Александрийский' in row.find_all('td')[1].text.strip()) if len(tables) > 0 else 0
+            peterhof_finishes_count = sum(1 for row in tables[0].find_all('tr')[1:] if tarjet_park in row.find_all('td')[1].text.strip()) if len(tables) > 0 else 0
             times = [row.find_all('td')[2].text.strip() for row in tables[0].find_all('tr')[2:]]  # list of all finish times except first 
             if len(times) > 0:
                 second_time = min(times)
@@ -279,7 +280,7 @@ async def parse_participant_page(participant_link, session, semaphore):
         if len(tables) != 2: # если есть волонтерства, то число таблиц не 2
             for row in tables[vol_tab].find_all('tr')[1:]:
                 location = row.find_all('td')[1].text.strip()
-                if 'Петергоф Александрийский' in location:
+                if tarjet_park in location:
                     date = row.find_all('td')[0].text.strip()  # Извлекаем дату
                     peterhof_volunteer_dates.add(date)  # Добавляем дату в множество (уникальные даты)
         peterhof_volunteers_count = len(peterhof_volunteer_dates)  # Количество уникальных дат волонтёрств
