@@ -13,7 +13,7 @@ st.header('Рекорды в Петергофе М')
 
 querie = '''
 SELECT ROW_NUMBER() OVER (ORDER BY min(time)) as num, profile_link, name, min(time) as лучшее,
-time(CAST(AVG(strftime('%s', time)) AS INTEGER), 'unixepoch') as среднее
+time(CAST(AVG(strftime('%s', time)) AS INTEGER), 'unixepoch') as среднее, count(*) as финишей
 FROM runners
 WHERE age_group LIKE "%М%"
 GROUP BY profile_link
@@ -38,7 +38,7 @@ st.header('Рекорды в Петергофе Ж')
 
 querie = '''
 SELECT ROW_NUMBER() OVER (ORDER BY min(time)) as num, profile_link, name, min(time) as лучшее,
-time(CAST(AVG(strftime('%s', time)) AS INTEGER), 'unixepoch') as среднее
+time(CAST(AVG(strftime('%s', time)) AS INTEGER), 'unixepoch') as среднее, count(*) as финишей
 FROM runners
 WHERE age_group LIKE "%Ж%"
 GROUP BY profile_link
