@@ -35,6 +35,7 @@ LEFT JOIN aProfs a
 ON u.profile_link = a.profile_link
 WHERE (95 <= CAST(u.finishes as INTEGER) AND CAST(u.finishes as INTEGER) <= 99)
 AND u.peterhof_finishes_count > 5
+ORDER BY 3 desc, 4 desc
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -111,6 +112,7 @@ LEFT JOIN aProfs a
 ON u.profile_link = a.profile_link
 WHERE (95 <= CAST(u.volunteers as INTEGER) AND CAST(u.volunteers as INTEGER) <= 99)
 AND u.peterhof_volunteers_count > 5
+ORDER BY 3 desc, 4 desc
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -149,6 +151,7 @@ LEFT JOIN aProfs a
 ON u.profile_link = a.profile_link
 WHERE (48 <= CAST(u.volunteers as INTEGER) AND CAST(u.volunteers as INTEGER) <= 49)
 AND u.peterhof_volunteers_count > 5
+ORDER BY 3 desc, 4 desc
 '''
 
 df = pd.read_sql(querie, con=engine)
