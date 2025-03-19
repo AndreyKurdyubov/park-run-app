@@ -20,8 +20,8 @@ SELECT profile_link, MAX(age_group) as ag
 FROM runners
 GROUP BY profile_link)
 SELECT ag as "Группа", count(ag) as "# участников", 
-        sum(CAST(peterhof_volunteers_count as int)) as "# олонтерств Петергоф",
-        sum(CAST(peterhof_finishes_count as int)) as "# пробежек Петергоф"
+        sum(CAST(peterhof_finishes_count as int)) as "# пробежек Петергоф",
+        sum(CAST(peterhof_volunteers_count as int)) as "# волонтерств Петергоф"
 FROM max_ag
 LEFT JOIN USERS u 
     ON max_ag.profile_link = u.profile_link
