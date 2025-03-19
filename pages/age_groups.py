@@ -78,7 +78,7 @@ st.data_editor(
     )
 
 st.header('Старты с наибольшим количеством детей до 19 лет')
-# st.markdown('Отсеяны те, у кого меньше 5 пробежек/волонтерств в Петергофе')
+st.markdown('Здесь не учитывается, что возрастная группа участников для давних стартов была другая')
 
 querie = '''
 WITH aProfs as (SELECT profile_link, run_date, run_number, finisher, volunteer
