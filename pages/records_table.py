@@ -10,6 +10,9 @@ menu()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
+def title(string):
+    return string.title()
+
 # Заголовок
 st.title('Таблицы по рекордсменам, новичкам и вступившим в клубы 10/25/50/100')
 
@@ -38,6 +41,7 @@ AND run_date = (
 '''
 
 df = pd.read_sql(querie, con=engine)
+names = df['name'].values
 
 # Отображаем таблицу
 st.data_editor(
@@ -54,6 +58,10 @@ st.data_editor(
     },
     hide_index=True
 )
+
+if st.button("Текст"):
+    st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
+
 
 # st.write(df['name'].unique())
 
@@ -257,6 +265,7 @@ st.data_editor(
     hide_index=True
 )
 
+# st.text(df['name'].values)
 
 st.header('Вступившие в клубы волонтёрств')
 
