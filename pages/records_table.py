@@ -13,10 +13,18 @@ engine = create_engine('sqlite:///mydatabase.db')
 def title(string):
     return string.title()
 
+def add_button(list_name, df):
+    names = df['name'].values
+    if st.button(f"{list_name} списком"):
+        st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
+        st.write(f"Всего: {len(names)}")
+
+
 # Заголовок
 st.title('Таблицы по рекордсменам, новичкам и вступившим в клубы 10/25/50/100')
-
-st.header('Рекорды')
+##############################################
+list_name = 'Рекорды'
+st.header(list_name)
 
 querie = '''
 SELECT 
@@ -41,7 +49,6 @@ AND run_date = (
 '''
 
 df = pd.read_sql(querie, con=engine)
-names = df['name'].values
 
 # Отображаем таблицу
 st.data_editor(
@@ -59,13 +66,12 @@ st.data_editor(
     hide_index=True
 )
 
-if st.button("Текст"):
-    st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
+add_button(list_name, df)
 
+##############################################
+list_name = 'Первый финиш на 5 верст'
+st.header(list_name)
 
-# st.write(df['name'].unique())
-
-st.header('Первый финиш на 5 верст')
 
 querie = '''
 SELECT 
@@ -89,6 +95,7 @@ AND run_date = (
 '''
 
 df = pd.read_sql(querie, con=engine)
+# names = df['name'].values
 
 # Отображаем таблицу
 st.data_editor(
@@ -105,7 +112,11 @@ st.data_editor(
     hide_index=True
 )
 
-st.header('Первый финиш в Петергофе')
+add_button(list_name, df)
+
+##############################################
+list_name = 'Первый финиш в Петергофе'
+st.header(list_name)
 
 querie = '''
 SELECT 
@@ -143,7 +154,11 @@ st.data_editor(
     hide_index=True
 )
 
-st.header('Первое волонтерство на 5 верст')
+add_button(list_name, df)
+
+##############################################
+list_name = 'Первое волонтерство на 5 верст'
+st.header(list_name)
 
 querie = '''
 WITH runner AS (
@@ -187,8 +202,11 @@ st.data_editor(
     },
     hide_index=True
 )
+add_button(list_name, df)
 
-st.header('Первое волонтерство в Петергофе')
+##############################################
+list_name = 'Первое волонтерство в Петергофе'
+st.header(list_name)
 
 querie = '''
 WITH runner AS (
@@ -234,8 +252,12 @@ st.data_editor(
     },
     hide_index=True
 )
+add_button(list_name, df)
 
-st.header('Вступившие в клубы пробегов')
+##############################################
+list_name = 'Вступившие в клубы пробегов'
+st.header(list_name)
+
 querie = '''
 SELECT     
     r.profile_link,
@@ -264,10 +286,11 @@ st.data_editor(
     },
     hide_index=True
 )
+add_button(list_name, df)
 
-# st.text(df['name'].values)
-
-st.header('Вступившие в клубы волонтёрств')
+##############################################
+list_name = 'Вступившие в клубы волонтёрств'
+st.header(list_name)
 
 querie = '''
 WITH runner AS (
@@ -313,8 +336,11 @@ st.data_editor(
     },
     hide_index=True
 )
+add_button(list_name, df)
 
-st.header('Вторая суббота в Петергофе')
+##############################################
+list_name = 'Вторая суббота в Петергофе'
+st.header(list_name)
 
 querie = '''
 WITH au as (
@@ -358,3 +384,4 @@ st.data_editor(
     },
     hide_index=True
 )
+add_button(list_name, df)
