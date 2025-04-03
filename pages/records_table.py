@@ -17,9 +17,12 @@ def title(string):
     return string.title()
 
 def add_button(list_name, df):
-    df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
-    df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
-    names = df_comb['tag'].values
+    if len(df) != 0:
+        df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
+        df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
+        names = df_comb['tag'].values
+    else:
+        names = df['name'].values
     if st.button(f"{list_name} списком"):
         st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
         st.write(f"Всего: {len(names)}")
