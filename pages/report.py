@@ -2,6 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
 from collections import OrderedDict as odict
+from menu import menu, tags_table, link_to_tag
 
 def title(string):
     return string.title()
@@ -27,8 +28,14 @@ WHERE run_number = (SELECT MAX(CAST(run_number as INT))
 
 df = pd.read_sql(querie, con=engine)
 
+df_tag = tags_table()
+
+df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
+
+df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
+
 roles = df['volunteer_role'].values
-names = df['name'].values
+names = df_comb['tag'].values
 role_dict = odict()
 
 for k in range(len(roles)):
@@ -39,22 +46,8 @@ for k in range(len(roles)):
 
 
 # Отображаем таблицу 
-st.data_editor(
-    df,
-    column_config={
-        'profile_link': st.column_config.LinkColumn(),
-    },
-    hide_index=True
-)
-
 st.markdown(f'''
-            Уникальных участников в таблице {len(df)}  
+            Количество волонтеров:{len(df)}  
             ''')
 
-
 st.write(dict_to_text(role_dict), unsafe_allow_html=True)
-
-st.write("""
-**INDUSTRY**  
-Software Application
-""")

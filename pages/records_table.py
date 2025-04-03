@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from menu import menu
+from menu import menu, tags_table, link_to_tag
 
 # Установка конфигурации страницы
 st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
@@ -10,15 +10,19 @@ menu()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
+# таблица тегов
+df_tag = tags_table()
+
 def title(string):
     return string.title()
 
 def add_button(list_name, df):
-    names = df['name'].values
+    df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
+    df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
+    names = df_comb['tag'].values
     if st.button(f"{list_name} списком"):
         st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
         st.write(f"Всего: {len(names)}")
-
 
 # Заголовок
 st.title('Таблицы по рекордсменам, новичкам и вступившим в клубы 10/25/50/100')
