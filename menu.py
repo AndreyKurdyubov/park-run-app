@@ -10,6 +10,9 @@ def menu():
     # st.sidebar.page_link("pages/FF.py", label="Фотофиниш")
     st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
 
+def title(string):
+    return string.title()
+
 def tags_table():
     # Таблица тегов
 
@@ -35,3 +38,36 @@ def link_to_tag(vk_link, name):
         return tag
     else: 
         return f"{name.title()}"
+    
+def showFF(start_num, names, positions, show=False, photos=False):
+    url = f"https://raw.githubusercontent.com/AndreyKurdyubov/FF/main/photos_{start_num}"
+    if show:
+        if photos:
+            for nam, pos in zip(names, positions):
+                st.write(f'{pos}. {nam}')
+                st.image(image=url + f"/{pos}.jpg")
+        else:
+            st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
+        st.write(f"Всего: {len(names)}")
+
+def add_control(start_num, list_name, names, positions, i):
+    # Создаем контейнер и применяем CSS для горизонтального расположения
+
+    button = st.button(f"{list_name}")
+    checkbox = st.checkbox(f"фото", key=i)
+
+    if f"checkbox_prev_state_{i}" not in st.session_state:
+        st.session_state[f"checkbox_prev_state_{i}"] = False
+
+    if f"button_prev_state_{i}" not in st.session_state:
+        st.session_state[f"button_prev_state_{i}"] = False
+
+    if checkbox:
+        st.session_state[f"checkbox_prev_state_{i}"] = checkbox
+
+    if button:
+        st.session_state[f"button_prev_state_{i}"] = not st.session_state[f"button_prev_state_{i}"]
+
+    if st.session_state[f"button_prev_state_{i}"]:
+        show = st.session_state[f"button_prev_state_{i}"]
+        showFF(start_num, names, positions, show=show, photos=checkbox)
