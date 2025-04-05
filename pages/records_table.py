@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from menu import menu, tags_table, link_to_tag
+from menu import menu, tags_table, link_to_tag, showFF, add_control, title
 
 # Установка конфигурации страницы
 st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
@@ -16,19 +16,29 @@ df_tag = tags_table()
 def title(string):
     return string.title()
 
-def add_button(list_name, df):
+def add_button(list_name, df, i):
     if len(df) != 0:
         df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
         df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
         names = df_comb['tag'].values
+        positions = df['position'].values
     else:
         names = df['name'].values
-    if st.button(f"{list_name} списком"):
-        st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
-        st.write(f"Всего: {len(names)}")
+        positions = df['position'].values
+    add_control(last_run, list_name, names, positions, i)
 
 # Заголовок
-st.title('Таблицы по рекордсменам, новичкам и вступившим в клубы 10/25/50/100')
+# get last run number and date
+querie = """
+SELECT MAX(CAST(run_number as INT)) as run_number, MAX(run_date) as run_date
+FROM runners
+"""
+df = pd.read_sql(querie, con=engine)
+last_run = df['run_number'].values[0]
+last_date = df['run_date'].values[0]
+
+st.title('Рекорды, новички, клубы 10/25/50/100')
+st.header(f"№{last_run} {last_date[:10]}")
 ##############################################
 list_name = 'Рекорды'
 st.header(list_name)
@@ -73,7 +83,8 @@ st.data_editor(
     hide_index=True
 )
 
-add_button(list_name, df)
+i = 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первый финиш на 5 верст'
@@ -119,7 +130,8 @@ st.data_editor(
     hide_index=True
 )
 
-add_button(list_name, df)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первый финиш в Петергофе'
@@ -161,7 +173,8 @@ st.data_editor(
     hide_index=True
 )
 
-add_button(list_name, df)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первое волонтерство на 5 верст'
@@ -209,7 +222,9 @@ st.data_editor(
     },
     hide_index=True
 )
-add_button(list_name, df)
+
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первое волонтерство в Петергофе'
@@ -259,7 +274,9 @@ st.data_editor(
     },
     hide_index=True
 )
-add_button(list_name, df)
+
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Вступившие в клубы пробегов'
@@ -293,7 +310,9 @@ st.data_editor(
     },
     hide_index=True
 )
-add_button(list_name, df)
+
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Вступившие в клубы волонтёрств'
@@ -343,7 +362,9 @@ st.data_editor(
     },
     hide_index=True
 )
-add_button(list_name, df)
+
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Вторая суббота в Петергофе'
@@ -391,4 +412,6 @@ st.data_editor(
     },
     hide_index=True
 )
-add_button(list_name, df)
+
+i = i + 1 # button key
+add_button(list_name, df, i)
