@@ -44,6 +44,10 @@ def showFF(start_num, names, positions, show=False, photos=False):
     if show:
         if photos:
             for nam, pos in zip(names, positions):
+                try:
+                    pos = int(pos)
+                except ValueError:
+                    pass
                 st.write(f'{pos}. {nam}')
                 st.image(image=url + f"/{pos}.jpg")
         else:
