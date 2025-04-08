@@ -46,10 +46,10 @@ def showFF(start_num, names, positions, show=False, photos=False):
             for nam, pos in zip(names, positions):
                 try:
                     pos = int(pos)
-                except ValueError:
-                    pass
-                st.write(f'{pos}. {nam}')
-                st.image(image=url + f"/{pos}.jpg")
+                    st.write(f'{pos}. {nam}')
+                    st.image(image=url + f"/{pos}.jpg")
+                except Exception as e:
+                    st.write(f'{nam} не бежала.')
         else:
             st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
         st.write(f"Всего: {len(names)}")
