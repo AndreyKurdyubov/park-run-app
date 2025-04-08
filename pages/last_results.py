@@ -62,7 +62,7 @@ st.data_editor(
     df,
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
-        'name': st.column_config.Column(label="Участник", width='medium'), 
+        'name': st.column_config.Column(label="Имя", width='medium'), 
         'time': st.column_config.Column(label="Время", width=''), 
         'position': st.column_config.Column(label="Позиция", width=''), 
     },
@@ -97,7 +97,7 @@ st.data_editor(
     df,
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
-        'name': st.column_config.Column(label="Роль", width='medium'), 
+        'name': st.column_config.Column(label="Имя", width='medium'), 
         'time': st.column_config.Column(label="Время", width=''),
         'volunteer_role': st.column_config.Column(label="Роль", width=''),
     },
