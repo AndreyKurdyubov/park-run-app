@@ -9,7 +9,8 @@ def menu():
     st.sidebar.page_link("pages/records_table.py", label="Клубы и рекорды")
     # st.sidebar.page_link("pages/FF.py", label="Фотофиниш")
     st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
-
+    st.sidebar.page_link("pages/last_results.py", label="Последние результаты")
+    
 def title(string):
     return string.title()
 
