@@ -52,7 +52,7 @@ def showFF(start_num, names, positions, show=False, photos=False):
                 except Exception as e:
                     st.write(f'{nam} не бежала.')
         else:
-            st.write("<br>".join(map(title, names)), unsafe_allow_html=True)
+            st.write("<br>".join(names), unsafe_allow_html=True)
         st.write(f"Всего: {len(names)}")
 
 def add_control(start_num, list_name, names, positions, i):

@@ -11,7 +11,7 @@ def dict_to_text(d):
     result = []
     for key, values in d.items():
         result.append(f"{key}:")
-        result.append(", ".join(map(title, values)))
+        result.append(", ".join(values))
     return "<br>".join(result)
 
 st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
