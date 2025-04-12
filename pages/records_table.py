@@ -329,8 +329,7 @@ WITH runner AS (
     WHERE run_date = (SELECT MAX(run_date) FROM runners)
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
     )
-SELECT 
-        o.profile_link,
+SELECT DISTINCT o.profile_link,
         o.name,
         u.volunteers,
         --substr(o.run_date, 1, 10),
@@ -379,7 +378,7 @@ UNION ALL
 SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
 WHERE profile_link LIKE "%userstats%")
-SELECT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, max(au.run_date) as last_date, count(distinct au.run_date) as num_subbot, 
+SELECT DISTINCT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, max(au.run_date) as last_date, count(distinct au.run_date) as num_subbot, 
 CAST(us.finishes AS INT) as finishes, 
 CAST(us.volunteers AS INT) as volunteers 
 --us.peterhof_finishes_count,
