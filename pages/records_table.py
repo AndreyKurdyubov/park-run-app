@@ -148,7 +148,7 @@ SELECT
     --achievements
 FROM runners
 WHERE (
-achievements LIKE '%Первый финиш на Петергоф Александрийский%'
+achievements LIKE '%Первый финиш на Петергоф%'
 )
 AND run_date = (
     SELECT MAX(run_date)
