@@ -50,7 +50,7 @@ def showFF(start_num, names, positions, show=False, photos=False):
                     st.write(f'{pos}. {nam}')
                     st.image(image=url + f"/{pos}.jpg")
                 except Exception as e:
-                    st.write(f'{nam} не бежала.')
+                    st.write(f'{nam} не бежал(а).')
         else:
             st.write("<br>".join(names), unsafe_allow_html=True)
         st.write(f"Всего: {len(names)}")
