@@ -26,6 +26,7 @@ def add_button(list_name, df, i):
         names = df['name'].values
         positions = df['position'].values
     add_control(last_run, list_name, names, positions, i)
+    return [list_name, len(names)]
 
 # Заголовок
 # get last run number and date
@@ -40,6 +41,7 @@ last_date = df['run_date'].values[0]
 st.title('Рекорды, новички, клубы 10/25/50/100')
 st.header(f"№{last_run} {last_date[:10]}")
 ##############################################
+tables_summary = []
 list_name = 'Рекорды'
 st.header(list_name)
 
@@ -84,7 +86,8 @@ st.data_editor(
 )
 
 i = 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первый финиш на 5 верст'
@@ -131,7 +134,8 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первый финиш в Петергофе'
@@ -174,7 +178,8 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первое волонтерство на 5 верст'
@@ -224,7 +229,8 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первое волонтерство в Петергофе'
@@ -276,7 +282,8 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Вступившие в клубы пробегов'
@@ -312,7 +319,8 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Вступившие в клубы волонтёрств'
@@ -363,7 +371,8 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Вторая суббота в Петергофе'
@@ -413,4 +422,12 @@ st.data_editor(
 )
 
 i = i + 1 # button key
-add_button(list_name, df, i)
+new_list = add_button(list_name, df, i)
+tables_summary.append(new_list)
+
+summary = ""
+for record in tables_summary:
+    summary += f"{record[0]}: {record[1]}<br>"
+
+st.header("Сводка")
+st.write(summary, unsafe_allow_html=True)
