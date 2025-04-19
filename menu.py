@@ -14,6 +14,13 @@ def menu():
 def title(string):
     return string.title()
 
+def dict_to_text(d):
+    result = []
+    for key, values in d.items():
+        result.append(f"{key}:")
+        result.append(", ".join(values))
+    return "<br>".join(result)
+
 def tags_table():
     # Таблица тегов
 
