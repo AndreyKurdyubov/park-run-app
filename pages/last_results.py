@@ -139,7 +139,7 @@ if button:
 
     # Отображаем таблицу 
     st.markdown(f'''
-                Количество волонтеров:{df_comb['tag'].nunique()}  
+                Количество волонтеров: {df_comb['tag'].nunique()}  
                 ''')
 
     st.write(dict_to_text(role_dict), unsafe_allow_html=True)
