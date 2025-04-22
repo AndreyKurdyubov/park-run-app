@@ -387,9 +387,12 @@ UNION ALL
 SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
 WHERE profile_link LIKE "%userstats%")
-SELECT DISTINCT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, max(au.run_date) as last_date, count(distinct au.run_date) as num_subbot, 
-CAST(us.finishes AS INT) as finishes, 
-CAST(us.volunteers AS INT) as volunteers 
+SELECT DISTINCT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, 
+max(au.run_date) as last_date, 
+substr(min(au.run_date), 1, 10) as first_date, 
+CAST(us.finishes AS INT) as "Всего финишей", 
+CAST(us.volunteers AS INT) as "Всего волонтерств",
+count(distinct au.run_date) as num_subbot
 --us.peterhof_finishes_count,
 --us.peterhof_volunteers_count
 FROM au
@@ -413,10 +416,11 @@ st.data_editor(
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'volunteer_role': st.column_config.Column(label="Роль", width=''),
         'position': st.column_config.Column(label="Позиция", width=''),
-        'last_date': None,
-        'num_subbot':  st.column_config.Column(label="# суббот в Петергофе", width=''),
+        'last_date' : None,
+        'first_date': st.column_config.Column(label="Первая суббота", width=''),
         'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width=''),
         'peterhof_volunteers_count': st.column_config.Column(label="# волонтерств в Петергофе", width=''),
+        'num_subbot': st.column_config.Column(label="# суббот в Петергофе", width=''),
     },
     hide_index=True
 )
