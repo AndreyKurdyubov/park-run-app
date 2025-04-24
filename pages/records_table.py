@@ -389,9 +389,9 @@ FROM organizers
 WHERE profile_link LIKE "%userstats%")
 SELECT DISTINCT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, 
 max(au.run_date) as last_date, 
-substr(min(au.run_date), 1, 10) as first_date, 
 CAST(us.finishes AS INT) as "Всего финишей", 
 CAST(us.volunteers AS INT) as "Всего волонтерств",
+--substr(min(au.run_date), 1, 10) as first_date, 
 count(distinct au.run_date) as num_subbot
 --us.peterhof_finishes_count,
 --us.peterhof_volunteers_count
