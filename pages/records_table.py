@@ -21,12 +21,14 @@ def add_button(list_name, df, i):
         df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
         df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
         names = df_comb['tag'].values
+        profiles = df_comb['profile_link'].values
         positions = df['position'].values
     else:
         names = df['name'].values
+        profiles = df['profile_link'].values
         positions = df['position'].values
     add_control(last_run, list_name, names, positions, i)
-    return [list_name, len(names)]
+    return [list_name, len(set(profiles))]
 
 # Заголовок
 # get last run number and date
@@ -387,23 +389,18 @@ UNION ALL
 SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
 WHERE profile_link LIKE "%userstats%")
-SELECT DISTINCT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, 
-max(au.run_date) as last_date, 
-CAST(us.finishes AS INT) as "Всего финишей", 
-CAST(us.volunteers AS INT) as "Всего волонтерств",
---substr(min(au.run_date), 1, 10) as first_date, 
-count(distinct au.run_date) as num_subbot
---us.peterhof_finishes_count,
---us.peterhof_volunteers_count
+SELECT DISTINCT au.profile_link, 
+    au.name, 
+    CAST(au.position AS INT) as position, 
+    au.volunteer_role, 
+    substr(min(au.run_date), 1, 10) as first_date, 
+    CAST(us.finishes AS INT) as "Всего финишей", 
+    CAST(us.volunteers AS INT) as "Всего волонтерств",
+    count(distinct au.run_date) as num_subbot
 FROM au
 JOIN users us on au.profile_link = us.profile_link
 GROUP BY au.profile_link 
-HAVING last_date = (SELECT max(run_date) FROM au) AND 
-                    (num_subbot = 2 
-                    --OR 
-                    --(us.peterhof_finishes_count = 2) OR 
-                    --(us.peterhof_volunteers_count = 2 AND au.volunteer_role IS NOT Null)
-                    )
+HAVING max(au.run_date) = (SELECT max(run_date) FROM au) AND num_subbot = 2
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -416,7 +413,6 @@ st.data_editor(
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'volunteer_role': st.column_config.Column(label="Роль", width=''),
         'position': st.column_config.Column(label="Позиция", width=''),
-        'last_date' : None,
         'first_date': st.column_config.Column(label="Первая суббота", width=''),
         'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width=''),
         'peterhof_volunteers_count': st.column_config.Column(label="# волонтерств в Петергофе", width=''),
