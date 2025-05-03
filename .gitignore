@@ -35,3 +35,17 @@ dist/
 *.egg-info/
 *.env
 .streamlit/secrets.toml
+
+pages/FF.py
+pages/age_groups.py
+pages/orgs_table.py
+pages/report.py
+pages/runs_table.py
+pages/short_output.py
+pages/subbota.py
+pages/tags.py
+pages/test2.py
+pages/test_ff.py
+pages/test_orgs.py
+pages/test_runners.py
+pages/test_users.py
