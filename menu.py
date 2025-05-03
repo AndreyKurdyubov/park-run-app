@@ -39,8 +39,9 @@ def tags_table():
     df_tag = pd.DataFrame(cop[1:], columns=cop[0])
     return df_tag
 
-def link_to_tag(vk_link, name):
+def link_to_tag(vk_link, name_5verst, name_real):
     id = str(vk_link)[15:]
+    name = name_real if isinstance(name_real, str) else name_5verst
     if len(id) > 0:
         tag = "@"  + id +  f" ({name.title()})"
         return tag

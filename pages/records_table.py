@@ -18,8 +18,8 @@ def title(string):
 
 def add_button(list_name, df, i):
     if len(df) != 0:
-        df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
-        df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
+        df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
+        df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
         names = df_comb['tag'].values
         profiles = df_comb['profile_link'].values
         positions = df['position'].values
