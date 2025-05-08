@@ -5,11 +5,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import create_engine, text
 from datetime import datetime
 import pandas as pd  
-import aiohttp
-import asyncio
-from aiohttp import ClientTimeout
-from asyncio import Semaphore
-from menu import menu
+from utils import menu
 
 #####################################################################################################################################################
 # Настройка страницы

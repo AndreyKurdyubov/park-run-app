@@ -1,3 +1,4 @@
+import streamlit_authenticator as stauth
 import streamlit as st
 import pandas as pd
 import gspread
@@ -84,3 +85,44 @@ def add_control(start_num, list_name, names, positions, i):
     if st.session_state[f"button_prev_state_{i}"]:
         show = st.session_state[f"button_prev_state_{i}"]
         showFF(start_num, names, positions, show=show, photos=checkbox)
+# login
+login_fields = {
+        'Form name': '', 
+        'Username': 'Логин', 
+        'Password': 'Пароль', 
+        'Login': 'Войти', 
+        'Captcha': 'Captcha'
+    }
+
+def authentication():
+    usernames = [
+        st.secrets['credentials']['user1']['username'], 
+        st.secrets['credentials']['user2']['username']
+        ]
+    names = [
+        st.secrets['credentials']['user1']['name'],
+        st.secrets['credentials']['user2']['name']
+        ]
+    hashed_passwords = [
+        st.secrets['credentials']['user1']['password'], 
+        st.secrets['credentials']['user2']['password']
+        ]
+
+    credentials = {
+        "usernames":{
+            usernames[0]:{
+                "name": names[0],
+                "password": hashed_passwords[0]
+                },
+            usernames[1]:{
+                "name": names[1],
+                "password": hashed_passwords[1]
+                }            
+            }
+        }
+    cookie_name = st.secrets['cookie']['name']
+    cookie_key = st.secrets['cookie']['key']
+    expiry_days = st.secrets['cookie']['expiry_days']
+
+    authenticator = stauth.Authenticate(credentials, cookie_name, cookie_key, expiry_days)
+    return authenticator

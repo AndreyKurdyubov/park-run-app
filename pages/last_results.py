@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from menu import menu, tags_table, link_to_tag, showFF, add_control, title, dict_to_text
+from utils import menu, tags_table, link_to_tag, showFF, add_control, title, dict_to_text
 from collections import OrderedDict as odict
 
 # Установка конфигурации страницы
@@ -10,23 +10,6 @@ st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
 menu()
 
 engine = create_engine('sqlite:///mydatabase.db')
-
-# # таблица тегов
-# df_tag = tags_table()
-
-# def title(string):
-#     return string.title()
-
-# def add_button(list_name, df, i):
-#     if len(df) != 0:
-#         df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
-#         df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
-#         names = df_comb['tag'].values
-#         positions = df['position'].values
-#     else:
-#         names = df['name'].values
-#         positions = df['position'].values
-#     add_control(last_run, list_name, names, positions, i)
 
 # Заголовок
 # get last run number and date

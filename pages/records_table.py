@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from menu import menu, tags_table, link_to_tag, showFF, add_control, title
+from utils import menu, tags_table, link_to_tag, showFF, add_control, title
 
 # Установка конфигурации страницы
 st.set_page_config(layout='wide', initial_sidebar_state='collapsed')

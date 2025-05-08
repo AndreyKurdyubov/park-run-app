@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 import streamlit as st
-from menu import menu
+from utils import menu
 import datetime
 
 st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
@@ -12,12 +12,6 @@ st.header('База участников 5 вёрст в Петергофе')
 
 engine = create_engine('sqlite:///mydatabase.db')
     
-# querie = '''
-# SELECT profile_link, sex, name, best_time, CAST(finishes as int) as finishes, 
-#         peterhof_finishes_count, CAST(volunteers as int) as volunteers, peterhof_volunteers_count, clubs_titles
-# FROM users
-# '''
-
 col1, col2 = st.columns(2)
 
 with col1:
