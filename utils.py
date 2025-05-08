@@ -1,16 +1,18 @@
 import streamlit_authenticator as stauth
 import streamlit as st
+from streamlit import session_state as ss
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
+import time
 
 def menu():
     st.sidebar.page_link("pages/home.py", label="Домашняя")
     st.sidebar.page_link("pages/main_table.py", label="Таблица участников")
     st.sidebar.page_link("pages/records_table.py", label="Клубы и рекорды")
-    # st.sidebar.page_link("pages/FF.py", label="Фотофиниш")
     st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
     st.sidebar.page_link("pages/last_results.py", label="Последние результаты")
+    st.sidebar.divider()
     
 def title(string):
     return string.title()
@@ -85,16 +87,9 @@ def add_control(start_num, list_name, names, positions, i):
     if st.session_state[f"button_prev_state_{i}"]:
         show = st.session_state[f"button_prev_state_{i}"]
         showFF(start_num, names, positions, show=show, photos=checkbox)
-# login
-login_fields = {
-        'Form name': '', 
-        'Username': 'Логин', 
-        'Password': 'Пароль', 
-        'Login': 'Войти', 
-        'Captcha': 'Captcha'
-    }
 
-def authentication():
+# authentication
+def authentication(page='main'):
     usernames = [
         st.secrets['credentials']['user1']['username'], 
         st.secrets['credentials']['user2']['username']
@@ -124,5 +119,43 @@ def authentication():
     cookie_key = st.secrets['cookie']['key']
     expiry_days = st.secrets['cookie']['expiry_days']
 
+    # login
+    login_fields = {
+        'Form name': '', 
+        'Username': 'Логин', 
+        'Password': 'Пароль', 
+        'Login': 'Войти', 
+        'Captcha': 'Captcha'
+    }
+
+    if page == 'login_page':
+        login_location = 'main'
+    else:
+        login_location = 'unrendered'
+
     authenticator = stauth.Authenticate(credentials, cookie_name, cookie_key, expiry_days)
-    return authenticator
+    time.sleep(1)
+    name, authentication_status, username = authenticator.login(location=login_location, key="Login", fields=login_fields)
+
+    if page == 'main':
+        if authentication_status:
+            st.session_state.authentication_status = True
+            st.sidebar.write(f"Вы вошли как {name}")
+            authenticator.logout('Выйти', 'sidebar', key='unique_key')
+        else:
+            st.sidebar.write(f"Вы не вошли")
+            st.sidebar.page_link("pages/login_page.py", label="Войти", icon="↪")
+
+    elif page == 'login_page':
+        if authentication_status:
+            st.session_state.authentication_status = True
+            # time.sleep(0)
+            # st.switch_page('pages/home.py')
+        elif authentication_status is False:
+            st.session_state.authentication_status = False
+            st.error('Имя пользователя или пароль введены неверно')
+        elif authentication_status is None:
+            st.session_state.authentication_status = None
+            st.warning('Введите имя пользователя и пароль')
+
+    return authenticator, name, authentication_status, username

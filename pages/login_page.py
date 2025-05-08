@@ -3,20 +3,14 @@
 
 import streamlit_authenticator as stauth
 import streamlit as st
-from utils import authentication, login_fields
+from utils import authentication
+import time
 
-authenticator = authentication()
-name, authentication_status, username = authenticator.login(location="main", key="Login", fields=login_fields)
-
-if authentication_status:
-    st.session_state.authentication_status = True
-    st.switch_page('pages/home.py')
-elif authentication_status is False:
-    st.session_state.authentication_status = False
-    st.error('Username/password is incorrect')
-elif authentication_status is None:
-    st.session_state.authentication_status = None
-    st.warning('Please enter your username and password')
+authenticator, name, authentication_status, username = authentication(page='login_page')
 
 st.page_link("pages/home.py", label="Продолжить без входа", icon="🏠")
+if authentication_status:
+    time.sleep(1)
+    st.switch_page('pages/home.py')
+    
 # st.write(st.session_state)

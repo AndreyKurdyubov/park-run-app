@@ -1,11 +1,12 @@
 import os
 import streamlit as st
+from streamlit import session_state as ss
 import requests
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine, text
 from datetime import datetime
 import pandas as pd  
-from utils import menu
+from utils import menu, authentication
 
 #####################################################################################################################################################
 # Настройка страницы
@@ -15,6 +16,8 @@ from utils import menu
 st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
 menu()
+authenticator, name, authentication_status, username = authentication()
+st.write(ss)
 
 # Путь к изображению
 image_path = 'logo.jpg'
