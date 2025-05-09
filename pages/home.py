@@ -17,7 +17,6 @@ st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
-st.write(ss)
 
 # Путь к изображению
 image_path = 'logo.jpg'
@@ -224,31 +223,32 @@ def show_search(db_url):
     # db_url = 'sqlite:///mydatabase.db'
     engine = create_engine(db_url)
     try:
-        querie = '''
-        SELECT volunteer_role
-        FROM organizers
-        '''
-        df = pd.read_sql(querie, con=engine)
-        array_of_roles = df['volunteer_role'].unique()
-        roles = [role.split(', ') for role in array_of_roles]
-        unique_roles = []
-        for role in roles:
-            unique_roles.extend(role)
-        
-        st.divider()
+        if username in ['host', 'org']:
+            querie = '''
+            SELECT volunteer_role
+            FROM organizers
+            '''
+            df = pd.read_sql(querie, con=engine)
+            array_of_roles = df['volunteer_role'].unique()
+            roles = [role.split(', ') for role in array_of_roles]
+            unique_roles = []
+            for role in roles:
+                unique_roles.extend(role)
+            
+            st.divider()
 
-        st.subheader('Поиск по волонтерской роли:')
+            st.subheader('Поиск по волонтерской роли:')
 
-        option = st.selectbox(
-        "Поиск по волонтерской роли",
-        options=sorted(set(unique_roles)),
-        index=None,
-        placeholder="Выберите роль",
-        label_visibility='collapsed'
-        )
+            option = st.selectbox(
+            "Поиск по волонтерской роли",
+            options=sorted(set(unique_roles)),
+            index=None,
+            placeholder="Выберите роль",
+            label_visibility='collapsed'
+            )
 
-        if option:
-            go_search_by_role(option, engine)
+            if option:
+                go_search_by_role(option, engine)
 
         st.divider()
 
@@ -262,7 +262,8 @@ def show_search(db_url):
         if search_query:
             go_search_by_name(search_query, engine)
     except Exception as e:
-        st.write(f"Произошла ошибка: {e}")
+        # st.write(f"Произошла ошибка: {e}")
+        pass
 
 db_url='sqlite:///mydatabase.db'
 db_path = db_url.replace('sqlite:///', '')  # Извлекаем путь к файлу базы данных

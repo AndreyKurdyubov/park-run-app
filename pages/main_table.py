@@ -1,12 +1,13 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 import streamlit as st
-from utils import menu
+from utils import menu, authentication
 import datetime
 
-st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
+st.set_page_config(layout='wide')
 
 menu()
+authenticator, name, authentication_status, username = authentication()
 
 st.header('База участников 5 вёрст в Петергофе')
 

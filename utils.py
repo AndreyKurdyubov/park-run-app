@@ -12,6 +12,8 @@ def menu():
     st.sidebar.page_link("pages/records_table.py", label="Клубы и рекорды")
     st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
     st.sidebar.page_link("pages/last_results.py", label="Последние результаты")
+    if ('username' in ss) and (ss.username == 'host'):
+        st.sidebar.page_link("pages/update.py", label="Обновление базы")
     st.sidebar.divider()
     
 def title(string):
@@ -72,20 +74,20 @@ def add_control(start_num, list_name, names, positions, i):
     button = st.button(f"{list_name}")
     checkbox = st.checkbox(f"фото", key=i)
 
-    if f"checkbox_prev_state_{i}" not in st.session_state:
-        st.session_state[f"checkbox_prev_state_{i}"] = False
+    if f"checkbox_prev_state_{i}" not in ss:
+        ss[f"checkbox_prev_state_{i}"] = False
 
-    if f"button_prev_state_{i}" not in st.session_state:
-        st.session_state[f"button_prev_state_{i}"] = False
+    if f"button_prev_state_{i}" not in ss:
+        ss[f"button_prev_state_{i}"] = False
 
     if checkbox:
-        st.session_state[f"checkbox_prev_state_{i}"] = checkbox
+        ss[f"checkbox_prev_state_{i}"] = checkbox
 
     if button:
-        st.session_state[f"button_prev_state_{i}"] = not st.session_state[f"button_prev_state_{i}"]
+        ss[f"button_prev_state_{i}"] = not ss[f"button_prev_state_{i}"]
 
-    if st.session_state[f"button_prev_state_{i}"]:
-        show = st.session_state[f"button_prev_state_{i}"]
+    if ss[f"button_prev_state_{i}"]:
+        show = ss[f"button_prev_state_{i}"]
         showFF(start_num, names, positions, show=show, photos=checkbox)
 
 # authentication
@@ -134,28 +136,31 @@ def authentication(page='main'):
         login_location = 'unrendered'
 
     authenticator = stauth.Authenticate(credentials, cookie_name, cookie_key, expiry_days)
-    time.sleep(1)
-    name, authentication_status, username = authenticator.login(location=login_location, key="Login", fields=login_fields)
+    # time.sleep(1)
+    name, authentication_status, username = authenticator.login(location=login_location, key="Login", 
+    fields=login_fields)
+    ss.name = name
+    ss.username = username
 
     if page == 'main':
         if authentication_status:
-            st.session_state.authentication_status = True
+            ss.authentication_status = True
             st.sidebar.write(f"Вы вошли как {name}")
             authenticator.logout('Выйти', 'sidebar', key='unique_key')
         else:
             st.sidebar.write(f"Вы не вошли")
-            st.sidebar.page_link("pages/login_page.py", label="Войти", icon="↪")
+            st.sidebar.page_link("pages/login_page.py", label="**Войти**", icon="➡️")
 
     elif page == 'login_page':
         if authentication_status:
-            st.session_state.authentication_status = True
+            ss.authentication_status = True
             # time.sleep(0)
             # st.switch_page('pages/home.py')
         elif authentication_status is False:
-            st.session_state.authentication_status = False
+            ss.authentication_status = False
             st.error('Имя пользователя или пароль введены неверно')
         elif authentication_status is None:
-            st.session_state.authentication_status = None
+            ss.authentication_status = None
             st.warning('Введите имя пользователя и пароль')
 
     return authenticator, name, authentication_status, username

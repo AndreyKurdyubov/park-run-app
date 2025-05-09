@@ -1,13 +1,14 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from utils import menu, tags_table, link_to_tag, showFF, add_control, title, dict_to_text
+from utils import menu, authentication, tags_table, link_to_tag, dict_to_text
 from collections import OrderedDict as odict
 
 # Установка конфигурации страницы
-st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
+st.set_page_config(layout='wide')
 
 menu()
+authenticator, name, authentication_status, username = authentication()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
@@ -90,36 +91,37 @@ st.data_editor(
 
 # i = i + 1 # button key
 # add_button(list_name, df, i)
-button = st.button("Отчет")
+if username in ['host', 'org']:
+    button = st.button("Отчет")
 
-if button:
-    engine = create_engine('sqlite:///mydatabase.db')
-    querie = '''
-    SELECT * 
-    FROM organizers
-    WHERE run_number = (SELECT MAX(CAST(run_number as INT)) 
-                        FROM organizers) 
-    '''
+    if button:
+        engine = create_engine('sqlite:///mydatabase.db')
+        querie = '''
+        SELECT * 
+        FROM organizers
+        WHERE run_number = (SELECT MAX(CAST(run_number as INT)) 
+                            FROM organizers) 
+        '''
 
-    df = pd.read_sql(querie, con=engine)
-    df_tag = tags_table()
-    df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
-    df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
+        df = pd.read_sql(querie, con=engine)
+        df_tag = tags_table()
+        df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
+        df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
 
-    roles = df['volunteer_role'].values
-    names = df_comb['tag'].values
-    role_dict = odict()
+        roles = df['volunteer_role'].values
+        names = df_comb['tag'].values
+        role_dict = odict()
 
-    for k in range(len(roles)):
-        if roles[k] in role_dict:
-            role_dict[roles[k]].append(names[k])
-        else:
-            role_dict[roles[k]] = [names[k]]
+        for k in range(len(roles)):
+            if roles[k] in role_dict:
+                role_dict[roles[k]].append(names[k])
+            else:
+                role_dict[roles[k]] = [names[k]]
 
 
-    # Отображаем таблицу 
-    st.markdown(f'''
-                Количество волонтеров: {df_comb['tag'].nunique()}  
-                ''')
+        # Отображаем таблицу 
+        st.markdown(f'''
+                    Количество волонтеров: {df_comb['tag'].nunique()}  
+                    ''')
 
-    st.write(dict_to_text(role_dict), unsafe_allow_html=True)
+        st.write(dict_to_text(role_dict), unsafe_allow_html=True)

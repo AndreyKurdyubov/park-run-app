@@ -1,12 +1,13 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from utils import menu, tags_table, link_to_tag, showFF, add_control, title
+from utils import menu, authentication, tags_table, link_to_tag, add_control
 
 # Установка конфигурации страницы
-st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
+st.set_page_config(layout='wide')
 
 menu()
+authenticator, name, authentication_status, username = authentication()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
@@ -87,9 +88,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первый финиш на 5 верст'
@@ -135,9 +137,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первый финиш в Петергофе'
@@ -179,9 +182,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первое волонтерство на 5 верст'
@@ -230,9 +234,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Первое волонтерство в Петергофе'
@@ -283,9 +288,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Вступившие в клубы пробегов'
@@ -320,9 +326,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Вступившие в клубы волонтёрств'
@@ -372,9 +379,10 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
 ##############################################
 list_name = 'Вторая суббота в Петергофе'
@@ -421,13 +429,14 @@ st.data_editor(
     hide_index=True
 )
 
-i = i + 1 # button key
-new_list = add_button(list_name, df, i)
-tables_summary.append(new_list)
+if username in ['host', 'org']:
+    i = i + 1 # button key
+    new_list = add_button(list_name, df, i)
+    tables_summary.append(new_list)
 
-summary = ""
-for record in tables_summary:
-    summary += f"{record[0]}: {record[1]}<br>"
+    summary = ""
+    for record in tables_summary:
+        summary += f"{record[0]}: {record[1]}<br>"
 
-st.header("Сводка")
-st.write(summary, unsafe_allow_html=True)
+    st.header("Сводка")
+    st.write(summary, unsafe_allow_html=True)

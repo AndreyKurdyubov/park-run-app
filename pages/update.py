@@ -9,7 +9,7 @@ import aiohttp
 import asyncio
 from aiohttp import ClientTimeout
 from asyncio import Semaphore
-from utils import menu
+from utils import menu, authentication
 
 #####################################################################################################################################################
 # Настройка страницы
@@ -19,6 +19,10 @@ from utils import menu
 st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
 menu()
+authenticator, name, authentication_status, username = authentication()
+if username != 'host':
+    st.switch_page('pages/home.py')
+
 
 # Путь к изображению
 image_path = 'logo.jpg'
@@ -458,10 +462,11 @@ with col2:
         if last_date_db != last_date_site:
             st.write(f'Данные устарели. Дата в базе: {last_date_db}, дата на сайте: [{last_date_site}]({last_results_link}).')
              
-            if st.button('Обновить данные'):
-                st.write('Начинаем парсинг данных...')
-                asyncio.run(update_data())
-                st.success('Данные успешно сохранены в базу данных!')
+            if (username == "host"):
+                if (st.button('Обновить данные')):
+                    st.write('Начинаем парсинг данных...')
+                    asyncio.run(update_data())
+                    st.success('Данные успешно сохранены в базу данных!')
         else:
             st.markdown(f'''Данные актуальны 👍  
                         Последняя дата в базе данных: {last_date_db}  
