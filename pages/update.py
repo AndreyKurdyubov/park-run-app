@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from streamlit import session_state as ss
 import requests
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine, text
@@ -22,7 +23,6 @@ menu()
 authenticator, name, authentication_status, username = authentication()
 if username != 'host':
     st.switch_page('pages/home.py')
-
 
 # Путь к изображению
 image_path = 'logo.jpg'

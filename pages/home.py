@@ -17,6 +17,9 @@ st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
+if 'session_start' not in ss:
+    ss.session_start = 1
+    st.rerun()
 
 # Путь к изображению
 image_path = 'logo.jpg'
