@@ -1,17 +1,12 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
-from streamlit import session_state as ss
-from utils import menu, authentication, tags_table, link_to_tag, add_control
+from menu import menu, tags_table, link_to_tag, showFF, add_control, title
 
 # Установка конфигурации страницы
-st.set_page_config(layout='wide')
+st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
 
 menu()
-authenticator, name, authentication_status, username = authentication()
-if 'session_start' not in ss:
-    ss.session_start = 1
-    st.rerun()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
@@ -23,17 +18,14 @@ def title(string):
 
 def add_button(list_name, df, i):
     if len(df) != 0:
-        df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
-        df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
+        df_comb = df.merge(df_tag[['profile_link', 'VK link']], on='profile_link', how='left')
+        df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name']), axis=1)
         names = df_comb['tag'].values
-        profiles = df_comb['profile_link'].values
         positions = df['position'].values
     else:
         names = df['name'].values
-        profiles = df['profile_link'].values
         positions = df['position'].values
     add_control(last_run, list_name, names, positions, i)
-    return [list_name, len(set(profiles))]
 
 # Заголовок
 # get last run number and date
@@ -48,7 +40,6 @@ last_date = df['run_date'].values[0]
 st.title('Рекорды, новички, клубы 10/25/50/100')
 st.header(f"№{last_run} {last_date[:10]}")
 ##############################################
-tables_summary = []
 list_name = 'Рекорды'
 st.header(list_name)
 
@@ -92,10 +83,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первый финиш на 5 верст'
@@ -141,10 +130,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первый финиш в Петергофе'
@@ -161,7 +148,7 @@ SELECT
     --achievements
 FROM runners
 WHERE (
-achievements LIKE '%Первый финиш на Петергоф%'
+achievements LIKE '%Первый финиш на Петергоф Александрийский%'
 )
 AND run_date = (
     SELECT MAX(run_date)
@@ -186,10 +173,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первое волонтерство на 5 верст'
@@ -238,10 +223,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Первое волонтерство в Петергофе'
@@ -292,10 +275,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Вступившие в клубы пробегов'
@@ -330,10 +311,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Вступившие в клубы волонтёрств'
@@ -350,7 +329,8 @@ WITH runner AS (
     WHERE run_date = (SELECT MAX(run_date) FROM runners)
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
     )
-SELECT DISTINCT o.profile_link,
+SELECT 
+        o.profile_link,
         o.name,
         u.volunteers,
         --substr(o.run_date, 1, 10),
@@ -383,10 +363,8 @@ st.data_editor(
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
+i = i + 1 # button key
+add_button(list_name, df, i)
 
 ##############################################
 list_name = 'Вторая суббота в Петергофе'
@@ -401,18 +379,20 @@ UNION ALL
 SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
 WHERE profile_link LIKE "%userstats%")
-SELECT DISTINCT au.profile_link, 
-    au.name, 
-    CAST(au.position AS INT) as position, 
-    au.volunteer_role, 
-    substr(min(au.run_date), 1, 10) as first_date, 
-    CAST(us.finishes AS INT) as "Всего финишей", 
-    CAST(us.volunteers AS INT) as "Всего волонтерств",
-    count(distinct au.run_date) as num_subbot
+SELECT au.profile_link, au.name, CAST(au.position AS INT) as position, au.volunteer_role, max(au.run_date) as last_date, count(distinct au.run_date) as num_subbot, 
+CAST(us.finishes AS INT) as finishes, 
+CAST(us.volunteers AS INT) as volunteers 
+--us.peterhof_finishes_count,
+--us.peterhof_volunteers_count
 FROM au
 JOIN users us on au.profile_link = us.profile_link
 GROUP BY au.profile_link 
-HAVING max(au.run_date) = (SELECT max(run_date) FROM au) AND num_subbot = 2
+HAVING last_date = (SELECT max(run_date) FROM au) AND 
+                    (num_subbot = 2 
+                    --OR 
+                    --(us.peterhof_finishes_count = 2) OR 
+                    --(us.peterhof_volunteers_count = 2 AND au.volunteer_role IS NOT Null)
+                    )
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -425,22 +405,13 @@ st.data_editor(
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'volunteer_role': st.column_config.Column(label="Роль", width=''),
         'position': st.column_config.Column(label="Позиция", width=''),
-        'first_date': st.column_config.Column(label="Первая суббота", width=''),
+        'last_date': None,
+        'num_subbot':  st.column_config.Column(label="# суббот в Петергофе", width=''),
         'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width=''),
         'peterhof_volunteers_count': st.column_config.Column(label="# волонтерств в Петергофе", width=''),
-        'num_subbot': st.column_config.Column(label="# суббот в Петергофе", width=''),
     },
     hide_index=True
 )
 
-if username in ['host', 'org']:
-    i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
-    tables_summary.append(new_list)
-
-    summary = ""
-    for record in tables_summary:
-        summary += f"{record[0]}: {record[1]}<br>"
-
-    st.header("Сводка")
-    st.write(summary, unsafe_allow_html=True)
+i = i + 1 # button key
+add_button(list_name, df, i)

@@ -47,12 +47,21 @@ with col1:
     st.subheader('Список страниц:')
     # st.page_link("pages_dir\main_table.py", label="База участников")
     # st.page_link("pages_dir\records_table.py", label="Клубы и рекорды")
-    st.markdown('''
-    - [База участников](main_table)
-    - [Клубы и рекорды](records_table)
-    - [Почти в клубе](almost_club)
-    - [Последние результаты](last_results)
-    ''')
+    if username in ['org', 'host']:
+        st.markdown('''
+        - [База участников](main_table)
+        - [Клубы и рекорды](records_table)
+        - [Почти в клубе](almost_club)
+        - [Какие люди!](hellothere)
+        - [Последние результаты](last_results)
+        ''')
+    else:
+        st.markdown('''
+        - [База участников](main_table)
+        - [Клубы и рекорды](records_table)
+        - [Почти в клубе](almost_club)
+        - [Последние результаты](last_results)
+        ''')
 
 #####################################################################################################################################################
 # Парсинг

@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 import streamlit as st
+from streamlit import session_state as ss
 from utils import menu, authentication
 import datetime
 
@@ -8,6 +9,9 @@ st.set_page_config(layout='wide')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
+if 'session_start' not in ss:
+    ss.session_start = 1
+    st.rerun()
 
 st.header('База участников 5 вёрст в Петергофе')
 

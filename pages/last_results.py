@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
+from streamlit import session_state as ss
 from utils import menu, authentication, tags_table, link_to_tag, dict_to_text
 from collections import OrderedDict as odict
 
@@ -9,6 +10,9 @@ st.set_page_config(layout='wide')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
+if 'session_start' not in ss:
+    ss.session_start = 1
+    st.rerun()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
