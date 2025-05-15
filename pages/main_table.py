@@ -9,9 +9,9 @@ st.set_page_config(layout='wide')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
-if 'session_start' not in ss:
-    ss.session_start = 1
-    st.rerun()
+# if 'session_start' not in ss:
+#     ss.session_start = 1
+#     st.rerun()
 
 st.header('База участников 5 вёрст в Петергофе')
 

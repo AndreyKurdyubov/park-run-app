@@ -11,11 +11,8 @@ def menu():
     st.sidebar.page_link("pages/main_table.py", label="Таблица участников")
     st.sidebar.page_link("pages/records_table.py", label="Клубы и рекорды")
     st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
-    if ('username' in ss) and (ss.username in ['org', 'host']):
-        st.sidebar.page_link("pages/hellothere.py", label="Какие люди!")
+    st.sidebar.page_link("pages/hellothere.py", label="Какие люди!")
     st.sidebar.page_link("pages/last_results.py", label="Последние результаты")
-    if ('username' in ss) and (ss.username == 'host'):
-        st.sidebar.page_link("pages/update.py", label="Обновление базы")
     st.sidebar.divider()
     
 def title(string):

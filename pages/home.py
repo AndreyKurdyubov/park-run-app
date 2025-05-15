@@ -17,9 +17,9 @@ st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
-if 'session_start' not in ss:
-    ss.session_start = 1
-    st.rerun()
+# if 'session_start' not in ss:
+#     ss.session_start = 1
+#     st.rerun()
 
 # Путь к изображению
 image_path = 'logo.jpg'
@@ -47,19 +47,21 @@ with col1:
     st.subheader('Список страниц:')
     # st.page_link("pages_dir\main_table.py", label="База участников")
     # st.page_link("pages_dir\records_table.py", label="Клубы и рекорды")
-    if username in ['org', 'host']:
+    if username in ['host']:
         st.markdown('''
         - [База участников](main_table)
         - [Клубы и рекорды](records_table)
         - [Почти в клубе](almost_club)
         - [Какие люди!](hellothere)
         - [Последние результаты](last_results)
+        - [Обновление](update)           
         ''')
     else:
         st.markdown('''
         - [База участников](main_table)
         - [Клубы и рекорды](records_table)
         - [Почти в клубе](almost_club)
+        - [Какие люди!](hellothere)
         - [Последние результаты](last_results)
         ''')
 

@@ -9,9 +9,9 @@ st.set_page_config(layout='wide')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
-if 'session_start' not in ss:
-    ss.session_start = 1
-    st.rerun()
+# if 'session_start' not in ss:
+#     ss.session_start = 1
+#     st.rerun()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
@@ -56,7 +56,7 @@ querie = '''
 SELECT 
     r.profile_link,
     r.name,
-    r.position,
+    CAST(r.position as INT) as position,
     r.time,
     u.second_time,
     time(-strftime('%s', r.time) + strftime('%s', u.second_time), 'unixepoch' ) as dif
@@ -71,7 +71,8 @@ achievements LIKE '%Личный рекорд!%'
 AND run_date = (
     SELECT MAX(run_date)
     FROM runners
-);
+)
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -106,7 +107,7 @@ querie = '''
 SELECT 
     r.profile_link,
     r.name,
-    r.position,
+    CAST(r.position as INT) as position,
     r.time
     --u.second_time
     --finishes,
@@ -120,7 +121,8 @@ achievements LIKE '%Первый финиш на 5 вёрст%'
 AND run_date = (
     SELECT MAX(run_date)
     FROM runners
-);
+)
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -155,7 +157,7 @@ SELECT
     profile_link,
     name,
     time, 
-    position,
+    CAST(position as INT) as position,
     finishes
     --volunteers,
     --achievements
@@ -166,7 +168,8 @@ achievements LIKE '%Первый финиш на Петергоф%'
 AND run_date = (
     SELECT MAX(run_date)
     FROM runners
-);
+)
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -201,7 +204,7 @@ WITH runner AS (
         profile_link,
         time,
         run_date,
-        position
+        CAST(position as INT) as position
     FROM runners
     WHERE run_date = (SELECT MAX(run_date) FROM runners)
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
@@ -218,7 +221,8 @@ WHERE volunteers = "1 волонтёрство"
 AND o.run_date = (
     SELECT MAX(run_date)
     FROM organizers
-);
+)
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -253,7 +257,7 @@ WITH runner AS (
         profile_link,
         time,
         run_date,
-        position
+        CAST(position as INT) as position
     FROM runners
     WHERE run_date = (SELECT MAX(run_date) FROM runners)
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
@@ -272,7 +276,7 @@ AND o.run_date = (
     SELECT MAX(o1.run_date)
     FROM organizers o1)
 AND NOT o.volunteers = "1 волонтёрство"
-;
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -307,10 +311,11 @@ SELECT
     r.name,
     u.finishes,
     r.time,
-    r.position
+    CAST(r.position as INT) as position
 FROM runners r
 LEFT JOIN USERS u on r.profile_link = u.profile_link
 WHERE r.run_date = (SELECT max(run_date) FROM runners) AND u.finishes IN (10, 25, 50, 100, 150)
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -345,7 +350,7 @@ WITH runner AS (
         profile_link,
         time,
         run_date,
-        position
+        CAST(position as INT) as position
     FROM runners
     WHERE run_date = (SELECT MAX(run_date) FROM runners)
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
@@ -364,6 +369,7 @@ SELECT DISTINCT o.profile_link,
     WHERE 
         u.volunteers IN (10, 25, 50, 100, 150)
         AND o.run_date = (SELECT MAX(run_date) FROM organizers)
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -413,6 +419,7 @@ FROM au
 JOIN users us on au.profile_link = us.profile_link
 GROUP BY au.profile_link 
 HAVING max(au.run_date) = (SELECT max(run_date) FROM au) AND num_subbot = 2
+ORDER BY position;
 '''
 
 df = pd.read_sql(querie, con=engine)

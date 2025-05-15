@@ -9,9 +9,9 @@ st.set_page_config(layout='wide')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
-if 'session_start' not in ss:
-    ss.session_start = 1
-    st.rerun()
+# if 'session_start' not in ss:
+#     ss.session_start = 1
+#     st.rerun()
 
 engine = create_engine('sqlite:///mydatabase.db')
 
@@ -45,12 +45,12 @@ last_date = df['run_date'].values[0]
 
 st.header(f"Какие люди! #{last_run} {last_date[:10]}")
 
-option = st.selectbox(
+option = st.radio(
         "Сколько суббот не были в Петергофе",
-        options=[5, 10, 20, 30],
+        options=[5, 10, 20, 30, 40, 50, 60],
         index=2,
-        placeholder="Количество мероприятий",
-        label_visibility='visible'
+        label_visibility='visible',
+        horizontal=True
         )
 querie = f'''
 WITH 
