@@ -80,10 +80,7 @@ SELECT
     o.name,
     o.volunteer_role
 FROM organizers o
-WHERE run_date = (
-    SELECT MAX(run_date)
-    FROM organizers
-);
+WHERE run_number = {run_number};
 '''
 
 df = pd.read_sql(querie, con=engine)
