@@ -21,7 +21,7 @@ df_tag = tags_table()
 def title(string):
     return string.title()
 
-def add_button(list_name, df, i):
+def add_button(run_number, list_name, df, i):
     if len(df) != 0:
         df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
         df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
@@ -32,27 +32,31 @@ def add_button(list_name, df, i):
         names = df['name'].values
         profiles = df['profile_link'].values
         positions = df['position'].values
-    add_control(last_run, list_name, names, positions, i)
+    add_control(run_number, list_name, names, positions, i)
     return [list_name, len(set(profiles))]
 
 # Заголовок
 # get last run number and date
 querie = """
-SELECT MAX(CAST(run_number as INT)) as run_number, MAX(run_date) as run_date
+SELECT distinct(CAST(run_number as INT)) as run_number, substr(run_date, 1, 10) as run_date
 FROM runners
+ORDER BY run_number DESC
+LIMIT 2
 """
 df = pd.read_sql(querie, con=engine)
-last_run = df['run_number'].values[0]
-last_date = df['run_date'].values[0]
+df["run"] = '#' + df['run_number'].astype(str) + ', ' + df['run_date']
 
 st.title('Рекорды, новички, клубы 10/25/50/100')
-st.header(f"№{last_run} {last_date[:10]}")
+run_select = st.selectbox("Выбрать номер забега", df["run"])
+run_number = run_select.split(",")[0].replace("#", "") # извлечь только номер забега
+
+# st.header(run_select)
 ##############################################
 tables_summary = []
-list_name = 'Рекорды'
-st.header(list_name)
+list_name = f'Рекорды'
+st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 SELECT 
     r.profile_link,
     r.name,
@@ -68,12 +72,13 @@ LEFT JOIN users u on u.profile_link = r.profile_link
 WHERE (
 achievements LIKE '%Личный рекорд!%' 
 )
-AND run_date = (
-    SELECT MAX(run_date)
-    FROM runners
-)
+AND run_number = {run_number}
 ORDER BY position;
 '''
+# AND run_date = (
+#     SELECT MAX(run_date)
+#     FROM runners
+# )
 
 df = pd.read_sql(querie, con=engine)
 
@@ -95,13 +100,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Первый финиш на 5 верст'
-st.header(list_name)
-
+list_name = f'Первый финиш на 5 верст'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 SELECT 
@@ -145,12 +149,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Первый финиш в Петергофе'
-st.header(list_name)
+list_name = f'Первый финиш в Петергофе'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 SELECT 
@@ -191,12 +195,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Первое волонтерство на 5 верст'
-st.header(list_name)
+list_name = f'Первое волонтерство на 5 верст'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 WITH runner AS (
@@ -244,12 +248,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Первое волонтерство в Петергофе'
-st.header(list_name)
+list_name = f'Первое волонтерство в Петергофе'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 WITH runner AS (
@@ -298,12 +302,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Вступившие в клубы пробегов'
-st.header(list_name)
+list_name = f'Вступившие в клубы пробегов'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 SELECT     
@@ -337,12 +341,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Вступившие в клубы волонтёрств'
-st.header(list_name)
+list_name = f'Вступившие в клубы волонтёрств'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 WITH runner AS (
@@ -391,12 +395,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
 ##############################################
-list_name = 'Вторая суббота в Петергофе'
-st.header(list_name)
+list_name = f'Вторая суббота в Петергофе'
+st.header(list_name + f'\n\n**{run_select}**')
 
 querie = '''
 WITH au as (
@@ -442,12 +446,12 @@ st.data_editor(
 
 if username in ['host', 'org']:
     i = i + 1 # button key
-    new_list = add_button(list_name, df, i)
+    new_list = add_button(run_number, list_name, df, i)
     tables_summary.append(new_list)
 
     summary = ""
     for record in tables_summary:
         summary += f"{record[0]}: {record[1]}<br>"
 
-    st.header("Сводка")
+    st.header("Сводка" + f'\n\n**{run_select}**')
     st.write(summary, unsafe_allow_html=True)

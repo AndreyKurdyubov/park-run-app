@@ -19,7 +19,9 @@ engine = create_engine('sqlite:///mydatabase.db')
 # st.header('Почти в крутом клубе 5 верст')
 
 st.header('Почти 50, 100 или 150 по пробегам 5 верст')
-st.markdown('Отсеяны те, у кого меньше 5 пробежек/волонтерств в Петергофе')
+st.markdown('**Отсеяны те, у кого меньше 5 пробежек/волонтерств в Петергофе**')
+st.markdown('**!!! По состоянию на текущий момент. За прошлый раз посмотреть нельзя !!!**')
+
 querie = '''
 WITH Profs as (SELECT profile_link, run_date
 FROM runners 

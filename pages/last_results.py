@@ -18,30 +18,38 @@ engine = create_engine('sqlite:///mydatabase.db')
 
 # Заголовок
 # get last run number and date
+# querie = """
+# SELECT MAX(CAST(run_number as INT)) as run_number, MAX(run_date) as run_date
+# FROM runners
+# """
+# df = pd.read_sql(querie, con=engine)
+# last_run = df['run_number'].values[0]
+# last_date = df['run_date'].values[0]
+
 querie = """
-SELECT MAX(CAST(run_number as INT)) as run_number, MAX(run_date) as run_date
+SELECT distinct(CAST(run_number as INT)) as run_number, substr(run_date, 1, 10) as run_date
 FROM runners
+ORDER BY run_number DESC
+LIMIT 2
 """
 df = pd.read_sql(querie, con=engine)
-last_run = df['run_number'].values[0]
-last_date = df['run_date'].values[0]
+df["run"] = '#' + df['run_number'].astype(str) + ', ' + df['run_date']
 
+run_select = st.selectbox("Выбрать номер забега", df["run"])
+run_number = run_select.split(",")[0].replace("#", "") # извлечь только номер забега
 
 ##############################################
 list_name = 'Протокол'
-st.header(f"{list_name} №{last_run} {last_date[:10]}")
+st.header(f"{list_name}\n\n**{run_select}**")
 
-querie = '''
+querie = f'''
 SELECT 
     r.profile_link,
     r.position,
     r.name,
     r.time
 FROM runners r
-WHERE run_date = (
-    SELECT MAX(run_date)
-    FROM runners
-);
+WHERE run_number = {run_number};
 '''
 
 df = pd.read_sql(querie, con=engine)
@@ -124,6 +132,7 @@ if username in ['host', 'org']:
 
 
         # Отображаем таблицу 
+        st.markdown(f'**Отчет {run_select}**')
         st.markdown(f'''
                     Количество волонтеров: {df_comb['tag'].nunique()}  
                     ''')
