@@ -105,11 +105,10 @@ if username in ['host', 'org']:
 
     if button:
         engine = create_engine('sqlite:///mydatabase.db')
-        querie = '''
+        querie = f'''
         SELECT * 
         FROM organizers
-        WHERE run_number = (SELECT MAX(CAST(run_number as INT)) 
-                            FROM organizers) 
+        WHERE run_number = {run_number};
         '''
 
         df = pd.read_sql(querie, con=engine)
