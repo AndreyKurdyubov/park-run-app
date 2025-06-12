@@ -74,7 +74,7 @@ list_name = 'Волонтеры'
 st.header(list_name)
 
 
-querie = '''
+querie = f'''
 SELECT 
     o.profile_link,
     o.name,
