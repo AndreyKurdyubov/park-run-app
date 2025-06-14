@@ -61,9 +61,9 @@ SELECT
     r.profile_link,
     r.name,
     CAST(r.position as INT) as position,
-    r.time,
-    u.second_time,
-    time(-strftime('%s', r.time) + strftime('%s', u.second_time), 'unixepoch' ) as dif
+    r.time
+    --u.second_time,
+    --time(-strftime('%s', r.time) + strftime('%s', u.second_time), 'unixepoch' ) as dif
     --finishes,
     --volunteers,
     --achievements
@@ -89,7 +89,7 @@ st.data_editor(
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'time': st.column_config.Column(label="Рекорд", width=''), 
-        'second_time': st.column_config.Column(label="Экс-рекорд", width=''), 
+        # 'second_time': st.column_config.Column(label="Экс-рекорд", width=''), 
         'position': st.column_config.Column(label="Позиция", width=''), 
         'finishes': st.column_config.Column(label="# финишей", width='medium'),
         'volunteers': st.column_config.Column(label="# волонтерств", width='medium'),
