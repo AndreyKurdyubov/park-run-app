@@ -107,7 +107,7 @@ if username in ['host', 'org']:
 list_name = f'Первый финиш на 5 верст'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 SELECT 
     r.profile_link,
     r.name,
@@ -122,10 +122,7 @@ LEFT JOIN users u on u.profile_link = r.profile_link
 WHERE (
 achievements LIKE '%Первый финиш на 5 вёрст%'
 )
-AND run_date = (
-    SELECT MAX(run_date)
-    FROM runners
-)
+AND run_number = {run_number}
 ORDER BY position;
 '''
 
@@ -156,7 +153,7 @@ if username in ['host', 'org']:
 list_name = f'Первый финиш в Петергофе'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 SELECT 
     profile_link,
     name,
@@ -169,10 +166,7 @@ FROM runners
 WHERE (
 achievements LIKE '%Первый финиш на Петергоф%'
 )
-AND run_date = (
-    SELECT MAX(run_date)
-    FROM runners
-)
+AND run_number = {run_number}
 ORDER BY position;
 '''
 
@@ -202,7 +196,7 @@ if username in ['host', 'org']:
 list_name = f'Первое волонтерство на 5 верст'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 WITH runner AS (
     SELECT 
         profile_link,
@@ -210,10 +204,10 @@ WITH runner AS (
         run_date,
         CAST(position as INT) as position
     FROM runners
-    WHERE run_date = (SELECT MAX(run_date) FROM runners)
+    WHERE run_number = {run_number}
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
     )
-SELECT 
+SELECT distinct
     o.profile_link,
     o.name,
     r.time,
@@ -222,10 +216,7 @@ FROM organizers o
 LEFT JOIN runner r 
     ON r.profile_link = o.profile_link
 WHERE volunteers = "1 волонтёрство"
-AND o.run_date = (
-    SELECT MAX(run_date)
-    FROM organizers
-)
+AND o.run_number = {run_number}
 ORDER BY position;
 '''
 
@@ -255,7 +246,7 @@ if username in ['host', 'org']:
 list_name = f'Первое волонтерство в Петергофе'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 WITH runner AS (
     SELECT 
         profile_link,
@@ -263,7 +254,7 @@ WITH runner AS (
         run_date,
         CAST(position as INT) as position
     FROM runners
-    WHERE run_date = (SELECT MAX(run_date) FROM runners)
+    WHERE run_number = {run_number}
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
     )
 SELECT 
@@ -276,9 +267,7 @@ FROM organizers o
 JOIN users u on u.profile_link = o.profile_link
 LEFT JOIN runner r ON r.profile_link = o.profile_link
 WHERE u.peterhof_volunteers_count = 1 
-AND o.run_date = (
-    SELECT MAX(o1.run_date)
-    FROM organizers o1)
+AND o.run_number = {run_number}
 AND NOT o.volunteers = "1 волонтёрство"
 ORDER BY position;
 '''
@@ -309,7 +298,7 @@ if username in ['host', 'org']:
 list_name = f'Вступившие в клубы пробегов'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 SELECT     
     r.profile_link,
     r.name,
@@ -318,7 +307,7 @@ SELECT
     CAST(r.position as INT) as position
 FROM runners r
 LEFT JOIN USERS u on r.profile_link = u.profile_link
-WHERE r.run_date = (SELECT max(run_date) FROM runners) AND u.finishes IN (10, 25, 50, 100, 150)
+WHERE r.run_number = {run_number} AND u.finishes IN (10, 25, 50, 100, 150)
 ORDER BY position;
 '''
 
@@ -348,7 +337,7 @@ if username in ['host', 'org']:
 list_name = f'Вступившие в клубы волонтёрств'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 WITH runner AS (
     SELECT 
         profile_link,
@@ -356,7 +345,7 @@ WITH runner AS (
         run_date,
         CAST(position as INT) as position
     FROM runners
-    WHERE run_date = (SELECT MAX(run_date) FROM runners)
+    WHERE run_number = {run_number}
     --WHERE substr(run_date, 1, 10) = "2025-01-04"
     )
 SELECT DISTINCT o.profile_link,
@@ -372,7 +361,7 @@ SELECT DISTINCT o.profile_link,
         ON r.profile_link = o.profile_link
     WHERE 
         u.volunteers IN (10, 25, 50, 100, 150)
-        AND o.run_date = (SELECT MAX(run_date) FROM organizers)
+        AND o.run_number = {run_number}
 ORDER BY position;
 '''
 
@@ -402,7 +391,7 @@ if username in ['host', 'org']:
 list_name = f'Вторая суббота в Петергофе'
 st.header(list_name + f'\n\n**{run_select}**')
 
-querie = '''
+querie = f'''
 WITH au as (
 SELECT profile_link, name, run_date, position, Null as volunteer_role
 FROM runners
@@ -410,7 +399,7 @@ WHERE profile_link LIKE "%userstats%"
 UNION ALL
 SELECT profile_link, name, run_date, Null as position, volunteer_role
 FROM organizers 
-WHERE profile_link LIKE "%userstats%")
+WHERE profile_link LIKE "%userstats%" AND run_number <= {run_number})
 SELECT DISTINCT au.profile_link, 
     au.name, 
     CAST(au.position AS INT) as position, 
