@@ -43,34 +43,25 @@ list_name = 'Протокол'
 st.header(f"{list_name}\n\n**{run_select}**")
 
 querie = f'''
-WITH run as (
-SELECT profile_link, name, time, run_date, CAST(run_number as INT) as run_number, position
-FROM runners
-WHERE run_number = {run_number}),
-org as (
-SELECT profile_link, name, run_date, CAST(run_number as INT) as run_number, GROUP_CONCAT(volunteer_role, ', ') as roles
-FROM organizers 
-WHERE run_number = {run_number}
-GROUP BY profile_link, run_date)
-SELECT profile_link, 
-    name, 
-    CAST(run.position AS INT) as position, 
-    run.time,
-    org.roles
-FROM run FULL OUTER JOIN org USING (profile_link, name)
+SELECT 
+    r.profile_link,
+    r.position,
+    r.name,
+    r.time
+FROM runners r
+WHERE run_number = {run_number};
 '''
 
-df_total = pd.read_sql(querie, con=engine)
+df = pd.read_sql(querie, con=engine)
 
 # Отображаем таблицу
 st.data_editor(
-    df_total,
+    df,
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
         'name': st.column_config.Column(label="Имя", width='medium'), 
         'time': st.column_config.Column(label="Время", width=''), 
         'position': st.column_config.Column(label="Позиция", width=''), 
-        'roles': st.column_config.Column(label="Роли", width='large'),
     },
     hide_index=True
 )
@@ -78,34 +69,34 @@ st.data_editor(
 # i = 1 # button key
 # add_button(list_name, df, i)
 
-# ##############################################
-# list_name = 'Волонтеры'
-# st.header(list_name)
+##############################################
+list_name = 'Волонтеры'
+st.header(list_name)
 
 
-# querie = f'''
-# SELECT 
-#     o.profile_link,
-#     o.name,
-#     o.volunteer_role
-# FROM organizers o
-# WHERE run_number = {run_number};
-# '''
+querie = f'''
+SELECT 
+    o.profile_link,
+    o.name,
+    o.volunteer_role
+FROM organizers o
+WHERE run_number = {run_number};
+'''
 
-# df = pd.read_sql(querie, con=engine)
-# # names = df['name'].values
+df = pd.read_sql(querie, con=engine)
+# names = df['name'].values
 
-# # Отображаем таблицу
-# st.data_editor(
-#     df,
-#     column_config={
-#         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
-#         'name': st.column_config.Column(label="Имя", width='medium'), 
-#         'time': st.column_config.Column(label="Время", width=''),
-#         'volunteer_role': st.column_config.Column(label="Роль", width=''),
-#     },
-#     hide_index=True
-# )
+# Отображаем таблицу
+st.data_editor(
+    df,
+    column_config={
+        'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
+        'name': st.column_config.Column(label="Имя", width='medium'), 
+        'time': st.column_config.Column(label="Время", width=''),
+        'volunteer_role': st.column_config.Column(label="Роль", width=''),
+    },
+    hide_index=True
+)
 
 # i = i + 1 # button key
 # add_button(list_name, df, i)
@@ -114,15 +105,6 @@ if username in ['host', 'org']:
 
     if button:
         engine = create_engine('sqlite:///mydatabase.db')
-        #### финишеры
-        querie = f'''
-        SELECT * 
-        FROM runners
-        WHERE run_number = {run_number};
-        '''
-        df_run = pd.read_sql(querie, con=engine)
-        
-        #### волонтеры
         querie = f'''
         SELECT * 
         FROM organizers
@@ -146,11 +128,9 @@ if username in ['host', 'org']:
 
 
         # Отображаем таблицу 
-        st.write(f'''
-                    **Отчет {run_select}**<br>
-                    Количество финишеров: {len(df_run)}<br>
-                    Количество волонтеров: {df_comb['tag'].nunique()}<br>
-                    Количество уникальных участников: {len(df_total)}<br>
-                    ''', unsafe_allow_html=True)
+        st.markdown(f'**Отчет {run_select}**')
+        st.markdown(f'''
+                    Количество волонтеров: {df_comb['tag'].nunique()}  
+                    ''')
 
         st.write(dict_to_text(role_dict), unsafe_allow_html=True)
