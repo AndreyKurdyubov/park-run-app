@@ -391,31 +391,50 @@ if username in ['host', 'org']:
 list_name = f'Вторая суббота в Петергофе'
 st.header(list_name + f'\n\n**{run_select}**')
 
+# runners
 querie = f'''
-WITH au as (
-SELECT profile_link, name, run_date, position, Null as volunteer_role
+SELECT profile_link, name, 
+    substr(run_date, 1, 10) as run_date, 
+    CAST(run_number as INT) as run_number, 
+    CAST(position as INT) as position, 
+    time,
+    achievements
 FROM runners
-WHERE profile_link LIKE "%userstats%"
-UNION ALL
-SELECT profile_link, name, run_date, Null as position, volunteer_role
-FROM organizers 
-WHERE profile_link LIKE "%userstats%" AND run_number <= {run_number})
-SELECT DISTINCT au.profile_link, 
-    au.name, 
-    CAST(au.position AS INT) as position, 
-    au.volunteer_role, 
-    substr(min(au.run_date), 1, 10) as first_date, 
-    CAST(us.finishes AS INT) as "Всего финишей", 
-    CAST(us.volunteers AS INT) as "Всего волонтерств",
-    count(distinct au.run_date) as num_subbot
-FROM au
-JOIN users us on au.profile_link = us.profile_link
-GROUP BY au.profile_link 
-HAVING max(au.run_date) = (SELECT max(run_date) FROM au) AND num_subbot = 2
-ORDER BY position;
+WHERE CAST(run_number as INT) <= {run_number}
 '''
+df_run = pd.read_sql(querie, con=engine)
 
-df = pd.read_sql(querie, con=engine)
+# orgs
+querie = f'''
+SELECT profile_link, name, 
+    substr(run_date, 1, 10) as run_date,
+    CAST(run_number as INT) as run_number, 
+    GROUP_CONCAT(volunteer_role, ', ') as roles
+FROM organizers 
+WHERE CAST(run_number as INT) <= {run_number}
+GROUP BY profile_link, run_date
+'''
+df_org = pd.read_sql(querie, con=engine)
+
+# users
+querie = f'''
+SELECT profile_link, 
+    CAST(us.finishes AS INT) as num_fins, 
+    CAST(us.volunteers AS INT) as num_vols,
+    peterhof_finishes_count,
+    peterhof_volunteers_count
+FROM users us
+'''
+df_users = pd.read_sql(querie, con=engine)
+
+# merging
+df = df_run.merge(df_org, how='outer', on=['profile_link', 'name', 'run_number', 'run_date']
+                  ).merge(df_users, on='profile_link').sort_values(by='position', ascending=True)
+
+# df['dtype'] = df['roles'].isnull()
+df['num_subbot'] = df.groupby('profile_link')['run_date'].transform('count')
+df['first_date'] = df.groupby('profile_link')['run_date'].transform('min')
+df = df.query(f'run_number == {run_number} & num_subbot == 2')
 
 # Отображаем таблицу
 st.data_editor(
@@ -423,12 +442,18 @@ st.data_editor(
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
         'name': st.column_config.Column(label="Участник", width='medium'), 
-        'volunteer_role': st.column_config.Column(label="Роль", width=''),
+        'roles': st.column_config.Column(label="Роли", width=''),
         'position': st.column_config.Column(label="Позиция", width=''),
+        'time': st.column_config.Column(label="Время", width=''),
+        'run_date': None,
+        'run_number': st.column_config.Column(label="#", width=''),
+        'achievements': st.column_config.Column(label="Достижение", width='medium'),
+        'num_subbot': st.column_config.Column(label="Количество суббот", width=''),
         'first_date': st.column_config.Column(label="Первая суббота", width=''),
+        'num_fins': st.column_config.Column(label="Количество финишей", width=''),
+        'num_vols': st.column_config.Column(label="Количество волонтерств", width=''),
         'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width=''),
         'peterhof_volunteers_count': st.column_config.Column(label="# волонтерств в Петергофе", width=''),
-        'num_subbot': st.column_config.Column(label="# суббот в Петергофе", width=''),
     },
     hide_index=True
 )
