@@ -446,7 +446,7 @@ st.data_editor(
         'position': st.column_config.Column(label="Позиция", width=''),
         'time': st.column_config.Column(label="Время", width=''),
         'run_date': None,
-        'run_number': st.column_config.Column(label="#", width=''),
+        'run_number': None,
         'achievements': st.column_config.Column(label="Достижение", width='medium'),
         'num_subbot': st.column_config.Column(label="Количество суббот", width=''),
         'first_date': st.column_config.Column(label="Первая суббота", width=''),
