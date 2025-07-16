@@ -442,7 +442,7 @@ st.data_editor(
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
         'name': st.column_config.Column(label="Участник", width='medium'), 
-        'roles': st.column_config.Column(label="Роли", width=''),
+        'roles': st.column_config.Column(label="Роли", width='medium'),
         'position': st.column_config.Column(label="Позиция", width=''),
         'time': st.column_config.Column(label="Время", width=''),
         'run_date': None,
