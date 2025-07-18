@@ -38,7 +38,7 @@ querie = """
 SELECT distinct(CAST(run_number as INT)) as run_number, substr(run_date, 1, 10) as run_date
 FROM runners
 ORDER BY run_number DESC
-LIMIT 20
+LIMIT 5
 """
 df = pd.read_sql(querie, con=engine)
 df["run"] = '#' + df['run_number'].astype(str) + ', ' + df['run_date']
