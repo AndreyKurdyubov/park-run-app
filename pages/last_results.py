@@ -59,15 +59,16 @@ df_results = df_run.merge(df_org, how='outer', on=['profile_link', 'name', 'run_
 # Отображаем таблицу
 st.data_editor(
     df_results,
+    column_order=['profile_link', 'name', 'position', 'time', 'roles', 'achievements', 'finishes', 'volunteers'],
     column_config={
         'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
         'name': st.column_config.Column(label="Участник", width='medium'), 
         'roles': st.column_config.Column(label="Роли", width='large'),
         'position': st.column_config.Column(label="Позиция", width=''),
         'time': st.column_config.Column(label="Время", width=''),
-        'run_date': None,
-        'run_number': None,
         'achievements': st.column_config.Column(label="Достижение", width='medium'),
+        'finishes': st.column_config.Column(label="Количество финишей", width=''),
+        'volunteers': st.column_config.Column(label="Количество волонтерств", width=''),
     },
     hide_index=True
 )
@@ -106,6 +107,7 @@ if username in ['host', 'org']:
         st.write(f'''**Отчет {run_select}**<br>
                      Количество финишеров: {df_results['position'].max():.0f}<br>
                      Количество волонтеров: {df_comb['tag'].nunique()}<br>
-                     Количество уникальных участников: {len(df_results)}
+                     Количество уникальных участников: {len(df_results)}<br>
+                     Количество неизвестных: {len(df_results.query('not profile_link.str.contains("userstats")'))}
                     ''', unsafe_allow_html=True)
         st.write(dict_to_text(role_dict), unsafe_allow_html=True)
