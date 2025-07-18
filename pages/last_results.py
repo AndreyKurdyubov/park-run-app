@@ -37,6 +37,7 @@ SELECT profile_link, name, run_date,
     CAST(run_number as INT) as run_number, 
     CAST(position as INT) as position, 
     time,
+    finishes,
     achievements
 FROM runners
 WHERE run_number = {run_number}
@@ -46,7 +47,8 @@ df_run = pd.read_sql(querie, con=engine)
 querie = f'''
 SELECT profile_link, name, run_date, 
     CAST(run_number as INT) as run_number, 
-    GROUP_CONCAT(volunteer_role, ', ') as roles
+    GROUP_CONCAT(volunteer_role, ', ') as roles,
+    volunteers
 FROM organizers 
 WHERE run_number = {run_number}
 GROUP BY profile_link, run_date
