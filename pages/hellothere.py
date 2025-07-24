@@ -16,7 +16,7 @@ authenticator, name, authentication_status, username = authentication()
 engine = create_engine('sqlite:///mydatabase.db')
 
 # таблица тегов
-df_tag = tags_table()
+df_tag, _ = tags_table()
 
 def title(string):
     return string.title()

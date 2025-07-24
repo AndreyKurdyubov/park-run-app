@@ -10,7 +10,7 @@ import aiohttp
 import asyncio
 from aiohttp import ClientTimeout
 from asyncio import Semaphore
-from utils import menu, authentication
+from utils import menu, authentication, tags_table, dataframes
 
 #####################################################################################################################################################
 # Настройка страницы
@@ -473,7 +473,35 @@ with col2:
                 st.write('Начинаем парсинг данных...')
                 asyncio.run(update_data())
                 st.success('Данные успешно сохранены в базу данных!')
+        
+        # Добавление новых участников в базу
+        engine = create_engine('sqlite:///mydatabase.db')
+        df_run, df_org, df_users = dataframes(engine)
 
+        df_all = df_run.merge(df_org, how='outer', on='profile_link')
+        df_users = df_all.merge(df_users, how='left', on='profile_link')
+
+        df_tag, workbook = tags_table()
+
+        df_new = df_users[~df_users['profile_link'].isin(df_tag['profile_link'])]
+        df_new['name_title'] = df_new['name'].str.title()
+
+        st.write(f'''
+                Уникальных id в таблице google: {len(df_tag)}<br>
+                Уникальных id в базе: {len(df_users)}<br>
+                Количество новых участников: {len(df_new)}<br>
+        ''', unsafe_allow_html=True)
+
+        if len(df_users)-len(df_tag) > 0:
+            if st.button("Добавить новичков в таблицу гугл"):
+                workbook.sheet1.add_rows(len(df_users)-len(df_tag))
+                workbook.sheet1.update_acell('A2', f'=Sequence({len(df_users)};1)')
+
+                rows = df_new[['profile_link', 'sex', 'age_group', 'name', 'name_title']].fillna('').values.tolist()
+                workbook.sheet1.update(rows, f'R{len(df_tag)+2}C2:R{len(df_tag)+2+len(rows)}C6')
+                st.rerun()
+
+        
 #####################################################################################################################################################
 # Поиск по имени
 #####################################################################################################################################################

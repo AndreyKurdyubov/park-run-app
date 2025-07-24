@@ -41,7 +41,8 @@ def tags_table():
 
     cop = workbook.sheet1.get_all_values()
     df_tag = pd.DataFrame(cop[1:], columns=cop[0])
-    return df_tag
+    df_tag = df_tag.query(f'profile_link.str.contains("userstats")')
+    return df_tag, workbook
 
 def link_to_tag(vk_link, name_5verst, name_real):
     id = str(vk_link)[15:]
@@ -163,3 +164,30 @@ def authentication(page='main'):
             st.warning('Введите имя пользователя и пароль')
 
     return authenticator, name, authentication_status, username
+
+def dataframes(engine):
+    # runners
+    querie = f'''
+    SELECT distinct profile_link, max(age_group) as age_group
+    FROM runners
+    WHERE profile_link LIKE "%userstats%"
+    GROUP BY profile_link
+    '''
+    df_run = pd.read_sql(querie, con=engine) # all runs for run <= run_number
+
+    # orgs
+    querie = f'''
+    SELECT distinct profile_link
+    FROM organizers
+    WHERE profile_link LIKE "%userstats%"
+    '''
+    df_org = pd.read_sql(querie, con=engine) # all vols for run <= run_number
+
+    # users
+    querie = f'''
+    SELECT profile_link, name, sex
+    FROM users
+    '''
+    df_users = pd.read_sql(querie, con=engine) # all vols for run <= run_number
+
+    return df_run, df_org, df_users

@@ -90,7 +90,7 @@ if username in ['host', 'org']:
         '''
 
         df = pd.read_sql(querie, con=engine)
-        df_tag = tags_table()
+        df_tag, _ = tags_table()
         df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
         df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
 
