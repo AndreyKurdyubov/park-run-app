@@ -58,8 +58,8 @@ if datefrom:
     # users
     querie = f'''
     SELECT profile_link, name, best_time,
-        CAST(us.finishes AS INT) as num_fins, 
-        CAST(us.volunteers AS INT) as num_vols,
+        peterhof_finishes_count,
+        peterhof_volunteers_count,
         sex
     FROM users us
     '''
@@ -111,9 +111,9 @@ st.markdown(f'''
             ''')
 st.write("""Пояснение к колонкам:<br>
             **Рекорд** - личный рекорд **во всех парках за все время на 5 верст**<br>
+            **Сумма** - сумма финишей и волонтерств в **Петергофе** за период<br>
             **Финишей** - количество финишей в **Петергофе** за период<br>
             **Волонтерств** - количество волонтерств в **Петергофе** за период<br>
-            **Сумма** - сумма финишей и волонтерств в **Петергофе** за период
             """, unsafe_allow_html=True)
 
 # CSS для изменения ширины таблицы
@@ -133,7 +133,7 @@ st.markdown(table_css, unsafe_allow_html=True)
 with st.container():
     st.data_editor(
         df_comb,
-        column_order=['row_num', 'profile_link', 'name', 'sex', 'ag', 'best_time', 'num_runs_period', 'num_vols_period', 'sum_fin_vol'],
+        column_order=['row_num', 'profile_link', 'name', 'sex', 'ag', 'best_time', 'sum_fin_vol', 'num_runs_period', 'num_vols_period', 'peterhof_finishes_count', 'peterhof_volunteers_count'],
         column_config={
             'row_num': st.column_config.Column(label="#", width=''), 
             'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width='100px'),
@@ -141,13 +141,13 @@ with st.container():
             'sex': st.column_config.Column(label="Пол", width=''), 
             'ag': st.column_config.Column(label="Группа", width=''), 
             'best_time': st.column_config.Column(label="Рекорд", width='100px'),
-            'num_runs_period': st.column_config.Column(label="Финишей", width=''), 
-            'num_vols_period': st.column_config.Column(label="Волонтерств", width=''),
+            'num_runs_period': st.column_config.Column(label="Финишей за период", width=''), 
+            'num_vols_period': st.column_config.Column(label="Волонтерств за период", width=''),
             'sum_fin_vol': st.column_config.Column(label="Сумма", width=''),
             # 'finishes': st.column_config.Column(label="# финишей", width='100px'),
-            # 'peterhof_finishes_count': st.column_config.Column(label="# финишей в Петергофе", width='150px'),
+            'peterhof_finishes_count': st.column_config.Column(label="Всего финишей в Петергофе", width='150px'),
             # 'volunteers': st.column_config.Column(label="# волонтерств", width='120px'),
-            # 'peterhof_volunteers_count': st.column_config.Column(label="# волонтерств в Петергофе", width='150px'),
+            'peterhof_volunteers_count': st.column_config.Column(label="Всего волонтерств в Петергофе", width='150px'),
             # 'clubs_titles': st.column_config.Column(label="Клубы", width='large'),
         },
         hide_index=True,
