@@ -191,3 +191,9 @@ def dataframes(engine):
     df_users = pd.read_sql(querie, con=engine) # all vols for run <= run_number
 
     return df_run, df_org, df_users
+
+
+def find_db_files():
+    """Находит все файлы .db в директории"""
+    db_files = glob.glob(os.path.join('*.db'))
+    return db_files
