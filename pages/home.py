@@ -64,8 +64,10 @@ with col1:
             
             st.write('*Список страниц:*')
             # st.page_link("pages_dir\main_table.py", label="База участников")
-            st.page_link(r"pages\records_table.py", label="Клубы и рекорды")
-            st.page_link(r"pages\last_results.py", label="Последние результаты")
+            st.markdown('''
+            - [Клубы и рекорды](records_table)
+            - [Последние результаты](last_results)        
+            ''')
         else:
             st.write('База отсутствует')
 
