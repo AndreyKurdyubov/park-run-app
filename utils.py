@@ -4,14 +4,15 @@ from streamlit import session_state as ss
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
-import time
+from datetime import datetime
+import glob, os
 
 def menu():
     st.sidebar.page_link("pages/home.py", label="Домашняя")
-    st.sidebar.page_link("pages/main_table.py", label="Таблица участников")
+    # st.sidebar.page_link("pages/main_table.py", label="Таблица участников")
     st.sidebar.page_link("pages/records_table.py", label="Клубы и рекорды")
-    st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
-    st.sidebar.page_link("pages/hellothere.py", label="Какие люди!")
+    # st.sidebar.page_link("pages/almost_club.py", label="Почти в клубе")
+    # st.sidebar.page_link("pages/hellothere.py", label="Какие люди!")
     st.sidebar.page_link("pages/last_results.py", label="Последние результаты")
     st.sidebar.divider()
     
@@ -195,5 +196,13 @@ def dataframes(engine):
 
 def find_db_files():
     """Находит все файлы .db в директории"""
-    db_files = glob.glob(os.path.join('*.db'))
+    db_files = glob.glob(os.path.join('*[0-9].db'))
     return db_files
+
+
+def convert_date_string(date_string):
+    """
+    Преобразует строку формата '2025_11_05_18_14_03' в читаемый формат только с цифрами
+    """
+    dt = datetime.strptime(date_string, '%Y_%m_%d_%H_%M_%S')
+    return dt.strftime('%d.%m.%Y %H:%M:%S')

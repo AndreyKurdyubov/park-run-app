@@ -9,24 +9,27 @@ import pandas as pd
 from zoneinfo import ZoneInfo
 import glob
 import re
-from utils import find_db_files
-# from utils import menu, authentication
+from utils import find_db_files, convert_date_string
+from utils import menu, authentication
 
 #####################################################################################################################################################
 # Настройка страницы
 #####################################################################################################################################################
 
 # Конфигурация страницы
-# st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
+st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
-# menu()
-# authenticator, name, authentication_status, username = authentication()
+menu()
+authenticator, name, authentication_status, username = authentication()
 # if 'session_start' not in ss:
 #     ss.session_start = 1
 #     st.rerun()
 
+db_name = find_db_files()
+
 # Путь к изображению
 image_path = 'logo.jpg'
+num_runs = 3  # количество загружаемых протоколов
 
 # Вставка изображения
 st.image(image_path, caption='')
@@ -53,26 +56,36 @@ st.divider()
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader('Список страниц:')
-    # st.page_link("pages_dir\main_table.py", label="База участников")
-    # st.page_link("pages_dir\records_table.py", label="Клубы и рекорды")
-   #  if username in ['host']:
-   #      st.markdown('''
-   #      - [База участников](main_table)
-   #      - [Клубы и рекорды](records_table)
-   #      - [Почти в клубе](almost_club)
-   #      - [Какие люди!](hellothere)
-   #      - [Последние результаты](last_results)
-   #      - [Обновление](update)           
-   #      ''')
-   #  else:
-   #      st.markdown('''
-   #      - [База участников](main_table)
-   #      - [Клубы и рекорды](records_table)
-   #      - [Почти в клубе](almost_club)
-   #      - [Какие люди!](hellothere)
-   #      - [Последние результаты](last_results)
-   #      ''')
+    if username in ['host', 'org']:
+        if db_name:
+            db_name = 'sqlite:///' + db_name[-1]
+            st.success(f'Найдена БД от {convert_date_string(db_name[10:-3])}')
+            engine = create_engine(db_name)
+            
+            st.write('*Список страниц:*')
+            # st.page_link("pages_dir\main_table.py", label="База участников")
+            st.page_link(r"pages\records_table.py", label="Клубы и рекорды")
+            st.page_link(r"pages\last_results.py", label="Последние результаты")
+        else:
+            st.write('База отсутствует')
+
+    # if username in ['host']:
+    #     st.markdown('''
+    #     - [База участников](main_table)
+    #     - [Клубы и рекорды](records_table)
+    #     - [Почти в клубе](almost_club)
+    #     - [Какие люди!](hellothere)
+    #     - [Последние результаты](last_results)
+    #     - [Обновление](update)           
+    #     ''')
+    # else:
+    #     st.markdown('''
+    #     - [База участников](main_table)
+    #     - [Клубы и рекорды](records_table)
+    #     - [Почти в клубе](almost_club)
+    #     - [Какие люди!](hellothere)
+    #     - [Последние результаты](last_results)
+    #     ''')
 
 #####################################################################################################################################################
 # Парсинг
@@ -235,7 +248,7 @@ def get_full_run_data(run_data):
     all_participant_data = []
     all_volunteer_data = []
 
-    for run_dat in run_data[:2]:
+    for run_dat in run_data[:num_runs]:
         participants, volunteers = parse_participant_and_volunteer_tables(run_dat[3], run_dat)
     
         all_participant_data.extend(participants)
@@ -243,7 +256,7 @@ def get_full_run_data(run_data):
 
     return all_participant_data, all_volunteer_data
 
-def save_to_database(df_runners, df_orgs, db_url='sqlite:///mydatabase.db'):
+def save_to_database(df_runners, df_orgs, db_url):
     # Создаем подключение к базе данных
     print(db_url)
     engine = create_engine(db_url)
@@ -274,7 +287,7 @@ def update_data(all_participant_data, all_volunteer_data, db_name):
     save_to_database(df_runners, df_orgs, db_name)
 
 
-def get_last_date_from_db(db_url='sqlite:///mydatabase.db'):
+def get_last_date_from_db(db_url):
     # Извлекаем путь к файлу базы данных
     db_path = db_url.replace('sqlite:///', '')
     
@@ -284,11 +297,11 @@ def get_last_date_from_db(db_url='sqlite:///mydatabase.db'):
     
     # Извлекаем дату и время из названия файла
     filename = os.path.basename(db_path)
-    time_db = extract_datetime_from_filename(filename)
+    time_db = convert_date_string(filename[:-3])
     
     try:
         # Подключение к базе данных, если файл существует
-        st.write(db_url)
+        # st.write(db_url)
         engine = create_engine(db_url)
         with engine.connect() as connection:
             st.write('connected')
@@ -302,78 +315,32 @@ def get_last_date_from_db(db_url='sqlite:///mydatabase.db'):
             else:
                 last_date_db = None
     except Exception as e:
-        st.write('BAM')
         st.write(f"Произошла ошибка: {e}")
         return None, time_db
     
     return last_date_db, time_db
 
-def extract_datetime_from_filename(filename):
-    """
-    Извлекает дату и время из названия файла в формате YYYY_MM_DD_HH_MM_SS.db
-    """
-    # Регулярное выражение для поиска шаблона даты и времени
-    st.write('Re')
-    pattern = r'(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})\.db$'
-    match = re.search(pattern, filename)
+# def extract_datetime_from_filename(filename):
+#     """
+#     Извлекает дату и время из названия файла в формате YYYY_MM_DD_HH_MM_SS.db
+#     """
+#     # Регулярное выражение для поиска шаблона даты и времени
+#     pattern = r'(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})\.db$'
+#     match = re.search(pattern, filename)
     
-    if match:
-        year, month, day, hour, minute, second = map(int, match.groups())
-        try:
-            time_db = datetime(year, month, day, hour, minute, second)
-            st.write(time_db)
-            return time_db
-        except ValueError:
-            st.write('Incorrect data')
-            # Если дата некорректна (например, 2023_02_30_25_61_61.db)
-            return None
+#     if match:
+#         year, month, day, hour, minute, second = map(int, match.groups())
+#         try:
+#             time_db = datetime(year, month, day, hour, minute, second)
+#             st.write(time_db)
+#             return time_db
+#         except ValueError:
+#             st.write('Incorrect data')
+#             # Если дата некорректна (например, 2023_02_30_25_61_61.db)
+#             return None
     
-    return None  # Если шаблон не найден
+#     return None  # Если шаблон не найден
 
-
-if st.button('Получить список протоколов с сайта'):
-    run_data, now_t = get_last_date_from_site()
-    if run_data:
-        ss['run_data'] = run_data
-        ss['now_t'] = now_t
-        st.subheader(f'Актуальность данных на {now_t}')  
-        for run_dat in run_data[:2]:
-            location_name, number, date_cell, link, finishers, volunteers, avg_time, best_female_time, best_male_time = run_dat
-            st.markdown(f'''[#{number} {date_cell}]({link}), {finishers} фин. {volunteers} вол.''')
-
-# last_date_db = get_last_date_from_db()
-    
-# with col2:
-if st.button('Загрузить данные'):
-
-    if run_data:
-        st.subheader(f'Актуальность данных на {now_t}')  
-        for run_dat in run_data[:2]:
-            location_name, number, date_cell, link, finishers, volunteers, avg_time, best_female_time, best_male_time = run_dat
-            # st.markdown(f'''[#{number} {date_cell}]({link}), {finishers} фин. {volunteers} вол.''')
-        
-        all_participant_data, all_volunteer_data = get_full_run_data(run_data)
-        ss['all_participant_data'] = all_participant_data
-        ss['all_volunteer_data'] = all_volunteer_data
-        # st.markdown(f'''{all_participant_data[0]} {all_volunteer_data[0]}''')
-        # st.markdown(f'''{len(all_participant_data)} {len(all_volunteer_data)} {len(run_data)}''')
-    else:
-        st.subheader('Протоколы с сайта не загружены')
-
-if st.button('Сохранить в базу'):
-    if all_participant_data and all_volunteer_data and now_t:
-        print(now_t)
-        db_name = 'sqlite:///' + now_t.strftime("%Y_%m_%d_%H_%M_%S.db")
-        print(db_name)
-        update_data(all_participant_data, all_volunteer_data, db_name)
-
-if st.button('Проверка базы'):
-    # Использование:
-    db_name = 'sqlite:///' + find_db_files()[-1]
-    st.write(f'Найдена БД от {db_name}')
-
-    last_date_db, time_db = get_last_date_from_db(db_name)
-    st.write(f'Последняя дата в БД от {time_db}: {last_date_db}.')
 
 def keep_only_latest_db_by_mtime():
     """
@@ -405,5 +372,63 @@ def keep_only_latest_db_by_mtime():
     
     return latest_db
 
-if st.button('Удалить все базы кроме последней'):
-    keep_only_latest_db_by_mtime()
+if username in ['host']:
+    with col2:
+        st.write('*Управление БД:*')
+        if st.button('Получить список протоколов с сайта'):
+            try:
+                run_data, now_t = get_last_date_from_site()
+                if run_data:
+                    ss['run_data'] = run_data
+                    ss['now_t'] = now_t
+                    st.subheader(f'Протоколы с оф. сайта на {now_t}')  
+                    for run_dat in run_data[:num_runs]:
+                        location_name, number, date_cell, link, finishers, volunteers, avg_time, best_female_time, best_male_time = run_dat
+                        st.markdown(f'''[#{number} {date_cell}]({link}), {finishers} фин. {volunteers} вол.''')
+                    st.success('Списки получены')
+            except Exception as e:
+                st.write(f"Неожиданная ошибка: {e}")
+        # last_date_db = get_last_date_from_db()
+            
+        # with col2:
+        if st.button('Загрузить данные'):
+            if run_data:
+                # st.subheader(f'Актуальность данных на {now_t}')  
+                for run_dat in run_data[:num_runs]:
+                    location_name, number, date_cell, link, finishers, volunteers, avg_time, best_female_time, best_male_time = run_dat
+                    # st.markdown(f'''[#{number} {date_cell}]({link}), {finishers} фин. {volunteers} вол.''')
+                
+                try:
+                    all_participant_data, all_volunteer_data = get_full_run_data(run_data)
+                    ss['all_participant_data'] = all_participant_data
+                    ss['all_volunteer_data'] = all_volunteer_data
+                    st.success('Протоколы обработаны')
+                except Exception as e:
+                    st.write(f"Неожиданная ошибка: {e}")
+
+                # st.markdown(f'''{all_participant_data[0]} {all_volunteer_data[0]}''')
+                # st.markdown(f'''{len(all_participant_data)} {len(all_volunteer_data)} {len(run_data)}''')
+            else:
+                st.write('Протоколы с сайта не загружены')
+
+        if st.button('Сохранить данные в базу'):
+            if all_participant_data and all_volunteer_data and now_t:
+                print(now_t)
+                db_name = 'sqlite:///' + now_t.strftime("%Y_%m_%d_%H_%M_%S.db")
+                print(db_name)
+                update_data(all_participant_data, all_volunteer_data, db_name)
+                keep_only_latest_db_by_mtime()
+                st.success('Сохранено в базу')
+            else: 
+                st.write('Данные не получены')
+
+        if st.button('Проверка базы'):
+            # Использование:
+            db_name = find_db_files()
+            if db_name:
+                db_name = 'sqlite:///' + db_name[-1]
+                engine = create_engine(db_name)
+                st.success(f'Найдена БД от {convert_date_string(db_name[10:-3])}')
+            else:
+                st.write('База отсутствует')
+            # last_date_db, time_db = get_last_date_from_db(db_name)
