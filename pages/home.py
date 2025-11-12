@@ -143,13 +143,13 @@ def get_last_date_from_site():
         return run_data, now_t
         
     except requests.RequestException as e:
-        print(f"Ошибка при запросе к сайту: {e}")
+        st.write(f"Ошибка при запросе к сайту: {e}")
         return None, None
     except ValueError as e:
-        print(f"Ошибка при обработке данных: {e}")
+        st.write(f"Ошибка при обработке данных: {e}")
         return None, None
     except Exception as e:
-        print(f"Неожиданная ошибка: {e}")
+        st.write(f"Неожиданная ошибка: {e}")
         return None, None
 
 
