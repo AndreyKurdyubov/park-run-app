@@ -111,6 +111,7 @@ def get_last_date_from_site():
         
         response = requests.get(url, headers=headers, timeout=time_out)
         response.raise_for_status()  # Проверяем статус ответа
+        st.write('Загружаю список протоколов')
         time.sleep(random.uniform(1, 2.1))
         
         soup = BeautifulSoup(response.text, 'html.parser')
