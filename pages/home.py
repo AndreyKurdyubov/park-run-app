@@ -11,6 +11,8 @@ import glob
 import re
 from utils import find_db_files, convert_date_string
 from utils import menu, authentication
+import random
+import time
 
 #####################################################################################################################################################
 # Настройка страницы
@@ -42,7 +44,7 @@ hide_streamlit_style = """
             </style>
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-time_out = 5
+time_out = 20
 run_data = ss.get('run_data')
 now_t = ss.get('now_t')
 all_participant_data = ss.get('all_participant_data')
@@ -109,6 +111,7 @@ def get_last_date_from_site():
         
         response = requests.get(url, headers=headers, timeout=time_out)
         response.raise_for_status()  # Проверяем статус ответа
+        time.sleep(random.uniform(1, 2.1))
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
@@ -154,7 +157,7 @@ def get_last_date_from_site():
 
 
 def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
-    '''get data from last protocol'''
+    '''get tables from protocol'''
 
     try:
         # Добавляем заголовки для имитации браузера
@@ -166,6 +169,10 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
         response.raise_for_status()  # Проверяем статус ответа
         
         soup = BeautifulSoup(response.text, 'html.parser')
+        st.write(f'Загружаю протокол #{run_data[1]}')
+        time.sleep(random.uniform(3, 4.1))
+        # st.write('wake up')
+        
    
     except requests.RequestException as e:
         print(f"Ошибка при запросе к сайту: {e}")
@@ -202,7 +209,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
             age_group = cells[2].get_text(strip=True).split(' ')[0] if cells[2] else '—'
             age_grade_tag = cells[2].find('div', class_='age_grade')
             age_grade = age_grade_tag.get_text(strip=True) if age_grade_tag else '—'
-            time = cells[3].get_text(strip=True) if cells[3] else '—'
+            time_fin = cells[3].get_text(strip=True) if cells[3] else '—'
             achievements = []
             achievements_div = cells[3].find('div', class_='table-achievments')
             if achievements_div:
@@ -210,7 +217,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
                 for icon in achievement_icons:
                     achievements.append(icon['title'])
             participants_data.append([location_name, number, date_cell, link, finishers, volunteer_count, avg_time, best_female_time, best_male_time,
-                                      position, name, name_lc, profile_link, participant_id, clubs, finishes, volunteers, age_group, age_grade, time, ', '.join(achievements)])
+                                      position, name, name_lc, profile_link, participant_id, clubs, finishes, volunteers, age_group, age_grade, time_fin, ', '.join(achievements)])
             
     # Парсим волонтёров
     volunteer_table = all_tables[1]
