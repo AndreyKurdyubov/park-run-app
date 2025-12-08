@@ -1,0 +1,37 @@
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    # Запускается каждые 10 часов
+    - cron: '0 */10 * * *'
+  # Можно запустить вручную из интерфейса GitHub
+  workflow_dispatch:
+
+jobs:
+  make-dummy-commit:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Права на запись в репозиторий
+      
+    steps:
+      # Шаг 1: Получить код
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Шаг 2: Настроить Git
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+      
+      # Шаг 3: Создать пустой коммит
+      - name: Create dummy commit
+        run: |
+          # Создаем пустой коммит
+          git commit --allow-empty -m "🤖 Авто-обновление: $(date '+%Y-%m-%d %H:%M:%S')"
+          
+          # Отправляем в репозиторий
+          git push
