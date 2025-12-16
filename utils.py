@@ -6,6 +6,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
 import glob, os
+import requests
 
 def menu():
     st.sidebar.page_link("pages/home.py", label="Домашняя")
@@ -206,3 +207,25 @@ def convert_date_string(date_string):
     """
     dt = datetime.strptime(date_string, '%Y_%m_%d_%H_%M_%S')
     return dt.strftime('%d.%m.%Y %H:%M:%S')
+
+
+def get_public_ip():
+    """Получить публичный IP-адрес"""
+    try:
+        # Используем различные сервисы
+        services = [
+            'https://api.ipify.org',
+            'https://ident.me',
+            'https://checkip.amazonaws.com'
+        ]
+        
+        for service in services:
+            try:
+                response = requests.get(service, timeout=5)
+                if response.status_code == 200:
+                    return response.text.strip()
+            except:
+                continue
+        return "Не удалось получить публичный IP"
+    except Exception as e:
+        return f"Ошибка: {e}"

@@ -11,6 +11,7 @@ import glob
 import re
 from utils import find_db_files, convert_date_string
 from utils import menu, authentication
+from utils import get_public_ip
 import random
 import time
 
@@ -148,6 +149,7 @@ def get_last_date_from_site():
         
     except requests.RequestException as e:
         st.write(f"Ошибка при запросе к сайту: {e}")
+        st.write(f'Внешний IP: {get_public_ip()}')
         return None, None
     except ValueError as e:
         st.write(f"Ошибка при обработке данных: {e}")
@@ -442,3 +444,6 @@ if username in ['host']:
             else:
                 st.write('База отсутствует')
             # last_date_db, time_db = get_last_date_from_db(db_name)
+        
+        if st.button('Мой IP'):
+            st.write(f'Внешний IP: {get_public_ip()}')
