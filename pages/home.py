@@ -32,7 +32,7 @@ db_name = find_db_files()
 
 # Путь к изображению
 image_path = 'logo.jpg'
-num_runs = 3  # количество загружаемых протоколов
+num_runs = 2  # количество загружаемых протоколов
 
 # Вставка изображения
 st.image(image_path, caption='')
@@ -347,7 +347,7 @@ def get_last_date_from_db(db_url):
 #             st.write(time_db)
 #             return time_db
 #         except ValueError:
-#             st.write('Incorrect data')
+#             st.write('Incorrect data'
 #             # Если дата некорректна (например, 2023_02_30_25_61_61.db)
 #             return None
     
