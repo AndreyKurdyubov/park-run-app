@@ -1,4 +1,5 @@
 import os
+from socket import timeout
 import streamlit as st
 from streamlit import session_state as ss
 import requests
@@ -24,15 +25,12 @@ st.set_page_config(page_title='Duck🌳Run', page_icon=':running:')
 
 menu()
 authenticator, name, authentication_status, username = authentication()
-# if 'session_start' not in ss:
-#     ss.session_start = 1
-#     st.rerun()
 
 db_name = find_db_files()
 
 # Путь к изображению
 image_path = 'logo.jpg'
-num_runs = 2  # количество загружаемых протоколов
+num_runs = 1  # количество загружаемых протоколов
 
 # Вставка изображения
 st.image(image_path, caption='')
@@ -45,7 +43,7 @@ hide_streamlit_style = """
             </style>
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-time_out = 20
+time_out = 10
 run_data = ss.get('run_data')
 now_t = ss.get('now_t')
 all_participant_data = ss.get('all_participant_data')
@@ -113,7 +111,7 @@ def get_last_date_from_site():
         response = requests.get(url, headers=headers, timeout=time_out)
         response.raise_for_status()  # Проверяем статус ответа
         st.write('Загружаю список протоколов')
-        time.sleep(random.uniform(1, 2.1))
+        time.sleep(random.uniform(time_out, time_out+1))
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
@@ -173,7 +171,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
         
         soup = BeautifulSoup(response.text, 'html.parser')
         st.write(f'Загружаю протокол #{run_data[1]}')
-        time.sleep(random.uniform(3, 4.1))
+        time.sleep(random.uniform(time_out, time_out+1))
         # st.write('wake up')
         
    
@@ -200,6 +198,16 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
             name_lc = name.lower()
             profile_link = name_tag['href'] if name_tag else '—'
             participant_id = profile_link.split('/')[-1] if profile_link != '—' else '—'
+            
+            # пользовательский беговой клуб
+            user_name_div = cells[1].find('div')
+            inner_divs = user_name_div.find_all('div', recursive=False)
+            user_club = '-'
+            if len(inner_divs) > 1:
+                user_club = inner_divs[1].get_text() or '-'
+
+                
+            # количество волонтерств и пробежек
             stats_div = cells[1].find('div', class_='user-stat')
             finishes = '—'
             volunteers = '—'
@@ -207,6 +215,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
                 stats_spans = stats_div.find_all('span')
                 finishes = stats_spans[0].get_text(strip=True).split(' ')[0] if len(stats_spans) > 0 else '—'
                 volunteers = stats_spans[1].get_text(strip=True).split(' ')[0] if len(stats_spans) > 1 else '—'
+
             club_tags = cells[1].find_all('span', class_='club-icon')
             clubs = ', '.join([club['title'] for club in club_tags]) if club_tags else '—'
             age_group = cells[2].get_text(strip=True).split(' ')[0] if cells[2] else '—'
@@ -220,7 +229,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
                 for icon in achievement_icons:
                     achievements.append(icon['title'])
             participants_data.append([location_name, number, date_cell, link, finishers, volunteer_count, avg_time, best_female_time, best_male_time,
-                                      position, name, name_lc, profile_link, participant_id, clubs, finishes, volunteers, age_group, age_grade, time_fin, ', '.join(achievements)])
+                                      position, name, name_lc, profile_link, participant_id, user_club, clubs, finishes, volunteers, age_group, age_grade, time_fin, ', '.join(achievements)])
             
     # Парсим волонтёров
     volunteer_table = all_tables[1]
@@ -232,6 +241,15 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
             name_lc = name.lower()
             profile_link = name_tag['href'] if name_tag else '—'
             participant_id = profile_link.split('/')[-1] if profile_link != '—' else '—'
+            
+            # пользовательский беговой клуб
+            user_name_div = columns[0].find('div')
+            inner_divs = user_name_div.find_all('div', recursive=False)
+            user_club = '-'
+            if len(inner_divs) > 1:
+                user_club = inner_divs[1].get_text() or '_'
+            
+            # количество волонтерств и пробежек
             stats_div = columns[0].find('div', class_='user-stat')
             finishes = '—'
             volunteers = '—'
@@ -239,6 +257,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
                 stats_spans = stats_div.find_all('span')
                 finishes = stats_spans[0].get_text(strip=True).split(' ')[0] if len(stats_spans) > 0 else '—'
                 volunteers = stats_spans[1].get_text(strip=True).split(' ')[0] if len(stats_spans) > 1 else '—'
+
             club_tags = columns[0].find_all('span', class_='club-icon')
             clubs = ', '.join([club['title'] for club in club_tags]) if club_tags else '—'
             volunteer_role_info = columns[1].find('div', class_='volunteer__role')
@@ -251,7 +270,7 @@ def parse_participant_and_volunteer_tables(run_protocol_link, run_data):
                 first_volunteer_info = '—'
                 volunteer_role = '—'
             volunteers_data.append([location_name, number, date_cell, link, finishers, volunteer_count, avg_time, best_female_time, best_male_time,
-                                    name, name_lc, profile_link, participant_id, finishes, volunteers, clubs, volunteer_role, first_volunteer_info])
+                                    name, name_lc, profile_link, participant_id, user_club, finishes, volunteers, clubs, volunteer_role, first_volunteer_info])
     
     return participants_data, volunteers_data
 
@@ -283,7 +302,7 @@ def update_data(all_participant_data, all_volunteer_data, db_name):
     df_runners = pd.DataFrame(all_participant_data, columns=[
         'run', 'run_number', 'run_date', 'run_link', 'finisher', 'volunteer', 'avg_time',
         'best_female_time', 'best_male_time', 'position', 'name', 'name_lc', 'profile_link',
-        'participant_id', 'clubs', 'finishes', 'volunteers', 'age_group', 'age_grade',
+        'participant_id', 'user_club', 'clubs', 'finishes', 'volunteers', 'age_group', 'age_grade',
         'time', 'achievements'
     ])
     df_runners['run_date'] = pd.to_datetime(df_runners['run_date'], dayfirst=True)
@@ -291,8 +310,8 @@ def update_data(all_participant_data, all_volunteer_data, db_name):
     # Создаём DataFrame для волонтёров
     df_orgs = pd.DataFrame(all_volunteer_data, columns=[
         'run', 'run_number', 'run_date', 'run_link', 'finisher', 'volunteer', 'avg_time',
-        'best_female_time', 'best_male_time', 'name', 'name_lc', 'profile_link', 'participant_id',
-        'finishes', 'volunteers', 'clubs', 'volunteer_role', 'first_volunteer_info'
+        'best_female_time', 'best_male_time', 'name', 'name_lc', 'profile_link', 'participant_id', 
+        'user_club', 'finishes', 'volunteers', 'clubs', 'volunteer_role', 'first_volunteer_info'
     ])
     df_orgs['run_date'] = pd.to_datetime(df_orgs['run_date'], dayfirst=True)
 
@@ -331,27 +350,6 @@ def get_last_date_from_db(db_url):
         return None, time_db
     
     return last_date_db, time_db
-
-# def extract_datetime_from_filename(filename):
-#     """
-#     Извлекает дату и время из названия файла в формате YYYY_MM_DD_HH_MM_SS.db
-#     """
-#     # Регулярное выражение для поиска шаблона даты и времени
-#     pattern = r'(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})\.db$'
-#     match = re.search(pattern, filename)
-    
-#     if match:
-#         year, month, day, hour, minute, second = map(int, match.groups())
-#         try:
-#             time_db = datetime(year, month, day, hour, minute, second)
-#             st.write(time_db)
-#             return time_db
-#         except ValueError:
-#             st.write('Incorrect data'
-#             # Если дата некорректна (например, 2023_02_30_25_61_61.db)
-#             return None
-    
-#     return None  # Если шаблон не найден
 
 
 def keep_only_latest_db_by_mtime():

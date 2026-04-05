@@ -45,7 +45,8 @@ def main():
         CAST(position as INT) as position, 
         time,
         finishes,
-        achievements
+        achievements,
+        user_club
     FROM runners
     WHERE run_number = {run_number}
     '''
@@ -68,7 +69,7 @@ def main():
     # Отображаем таблицу
     st.data_editor(
         df_results,
-        column_order=['profile_link', 'name', 'position', 'time', 'roles', 'achievements', 'finishes', 'volunteers'],
+        column_order=['profile_link', 'name', 'position', 'time', 'roles', 'achievements', 'finishes', 'volunteers', 'user_club'],
         column_config={
             'profile_link': st.column_config.LinkColumn(label="id 5Вёрст", display_text=r"([0-9]*)$", width=''),
             'name': st.column_config.Column(label="Участник", width='medium'), 
@@ -78,6 +79,7 @@ def main():
             'achievements': st.column_config.Column(label="Достижение", width='medium'),
             'finishes': st.column_config.Column(label="Количество финишей", width=''),
             'volunteers': st.column_config.Column(label="Количество волонтерств", width=''),
+            'user_club': st.column_config.Column(label="The Club", width=''),
         },
         hide_index=True
     )
