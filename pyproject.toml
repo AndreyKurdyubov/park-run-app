@@ -20,6 +20,7 @@ google-auth-oauthlib = "^1.2.1"
 gspread = "^6.2.0"
 validators = "^0.34.0"
 streamlit-authenticator = "0.3.3"
+pyarrow = "22.0.0"
 
 
 
