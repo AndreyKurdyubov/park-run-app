@@ -12,7 +12,7 @@ ENV/
 
 # Poetry
 .poetry/
-# *.lock
+*.lock
 
 # IDE
 .idea/
