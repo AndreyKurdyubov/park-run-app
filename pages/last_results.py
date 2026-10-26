@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
 from streamlit import session_state as ss
-from utils import menu, authentication, tags_table, link_to_tag, dict_to_text, find_db_files, convert_date_string
+from utils import menu, authentication, tags_table, link_to_tag, dict_to_text, find_db_files, convert_date_string, name_or_tag
 from collections import OrderedDict as odict
 
 # Установка конфигурации страницы
@@ -100,11 +100,14 @@ def main():
 
             df = pd.read_sql(querie, con=engine)
             df_tag, _ = tags_table()
-            df_comb = df.merge(df_tag[['profile_link', 'VK link', "Имя"]], on='profile_link', how='left')
-            df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
+            df_comb = df.merge(df_tag[['profile_link', 'VK link', 'VK tag', "Имя"]], on='profile_link', how='left')
+            # df_comb['tag'] = df_comb.apply(lambda row: link_to_tag(row['VK link'], row['name'], row['Имя']), axis=1)
+            df_comb['tag'] = df_comb.apply(lambda row: name_or_tag(row['VK tag'], row['name'], row['Имя']), axis=1)
 
             roles = df['volunteer_role'].values
             names = df_comb['tag'].values
+            print(names)
+
             role_dict = odict()
 
             for k in range(len(roles)):
