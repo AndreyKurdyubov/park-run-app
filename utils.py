@@ -54,6 +54,14 @@ def link_to_tag(vk_link, name_5verst, name_real):
         return tag
     else: 
         return f"{name.title()}"
+
+def name_or_tag(vk_tag, name_5verst, name_real):
+    if isinstance(vk_tag, str) and len(vk_tag)>0:
+        return vk_tag
+    else:
+        name = name_real if isinstance(name_real, str) else name_5verst
+        return f"{name.title()}"
+
     
 def showFF(start_num, names, positions, show=False, photos=False):
     url = f"https://raw.githubusercontent.com/AndreyKurdyubov/FF/main/photos_{start_num}"
